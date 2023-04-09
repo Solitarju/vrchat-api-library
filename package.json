@@ -1,0 +1,11 @@
+{
+  "name": "vrchat-api",
+  "version": "1.0.0",
+  "description": "Unofficial API that provides a better way to interface with the VRC backend systems.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Solitarju",
+  "license": "GNU General Public License v3.0"
+}
