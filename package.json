@@ -1,5 +1,5 @@
 {
-  "name": "vrchat-api",
+  "name": "@solitarju/vrchat-api",
   "version": "1.0.0",
   "description": "Unofficial API that provides a better way to interface with the VRC backend systems.",
   "main": "index.js",
