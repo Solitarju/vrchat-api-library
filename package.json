@@ -11,5 +11,9 @@
   "dependencies": {
     "node-fetch": "^2.6.9",
     "ws": "^8.13.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Solitarju/vrchat-api.git"
   }
 }
