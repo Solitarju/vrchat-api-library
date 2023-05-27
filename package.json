@@ -1,7 +1,7 @@
 {
-  "name": "@solitarju/vrchat-api",
-  "version": "1.0.0",
-  "description": "Unofficial API that provides a better way to interface with the VRC backend systems.",
+  "name": "vrchat-api-library",
+  "version": "1.0.3",
+  "description": "Unofficial API that provides an easier way for developers to interact with the VRChat REST API and websockets.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

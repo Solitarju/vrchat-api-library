@@ -2,12 +2,18 @@
 
 ***Updated docs and readme soon™***
 
-Easy to build Node.JS applications using **vrchat-api**!!
+Easy to build Node.JS applications using **vrchat-api-library**!!
 
-Vrchat-api is a node library around the VRChat REST API as documented in the [*Unofficial* API docs](https://vrchatapi.github.io/docs/api/).
+Vrchat-api-library is a node library around the VRChat REST API as documented in the [*Unofficial* API docs](https://vrchatapi.github.io/docs/api/).
 Currently only 2 out of 15 major parts of the documented API have been developed in this library, but it also includes an undocumented part of VRChat.. **websockets**! allowing for real-time constant communication between clients and VRChat's backend.
 
-Right now I'm just uploading this as-is for anyone to use to ease development around VRChat's REST backend as personally I think their libraries just aren't good enough, it isn't complete yet I will be working on it over time to complete 100% coverage + websockets and maybe OSC, but most importantly I will try to get this updated so it is functional, stable and up to date with VRChat's backend.
+This isn't complete yet I will be working on it over time to complete 100% coverage + websockets and maybe OSC, but most importantly I will try to get this updated so it is functional, stable and up to date with VRChat's backend.
+
+### **Installation**
+To install this package through node package manager/npm, run this command:
+```
+npm i vrchat-api-library
+```
 
 ### **Classes/API Coverage**
 - Vrchat
