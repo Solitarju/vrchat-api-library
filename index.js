@@ -30,7 +30,30 @@ const fetch = require('node-fetch');
 const { EventEmitter } = require('events');
 const { WebSocket } = require('ws');
 
-class Events {
+class EventType {
+
+    static userOnline = new EventType('user-online');
+    static userUpdate = new EventType('user-update');
+    static userLocation = new EventType('user-location');
+    static userOffline = new EventType('user-offline');
+    static friendOnline = new EventType('friend-online');
+    static friendActive = new EventType('friend-active');
+    static friendUpdate = new EventType('friend-update');
+    static friendLocation = new EventType('friend-location');
+    static friendOffline = new EventType('friend-offline');
+    static friendAdd = new EventType('friend-add');
+    static friendDelete = new EventType('friend-delete');
+    static notification = new EventType('notification');
+    static showNotification = new EventType('show-notification');
+    static hideNotification = new EventType('hide-notification');
+    static error = new EventType('error');
+
+    constructor(type) {
+        this.type = type;
+    }
+}
+
+class EventsApi {
 
     #userid = "";
     #authCookie = "";
@@ -215,12 +238,17 @@ class Events {
     /**
      * Subscribe to websocket events and attach handler function.
      */
-    on(event = "", handlerCallback = () => {}) {
-        this.#EventEmitter.on(event, handlerCallback);
+    on(event = EventType, handlerCallback = () => {}) {
+        if(!event instanceof EventType) {
+            this.#EventEmitter.on(event, handlerCallback);
+            return;
+        }
+
+        this.#EventEmitter.on(event.type, handlerCallback);
     }
 }
 
-class Authentication {
+class AuthenticationApi {
 
     #APIEndpoint = "https://api.vrchat.cloud/api/1";
     #userid = "";
@@ -495,7 +523,7 @@ class Authentication {
     }
 }
 
-class User {
+class UsersApi {
 
     #APIEndpoint = "https://api.vrchat.cloud/api/1";
 
@@ -640,30 +668,17 @@ class Vrchat {
     #twoFactorAuth = "";
     #debug = false;
 
-    EventType = {
-        "userOnline": "user-online",
-        "userUpdate": "user-update",
-        "userLocation": "user-location",
-        "userOffline": "user-offline",
-        "friendOnline": "friend-online",
-        "friendActive": "friend-active",
-        "friendUpdate": "friend-update",
-        "friendLocation": "friend-location",
-        "friendOffline": "friend-offline",
-        "friendAdd": "friend-add",
-        "friendDelete": "friend-delete",
-        "notification": "notification",
-        "showNotification": "show-notification",
-        "hideNotification": "hide-notification",
-        "error": "error"
-    };
+    Events = new EventsApi();
+    Authentication = new AuthenticationApi();
+    Users = new UsersApi();
 
-    Events = new Events();
-    Authentication = new Authentication();
-    User = new User();
-
-    constructor({debug = false} = {}) {
+    constructor(debug = false) {
         this.#debug = debug;
+    }
+
+    #Debug(x) {
+        if(!this.#debug === true) return;
+        console.log(x);
     }
 
     /**
@@ -689,7 +704,7 @@ class Vrchat {
                 if(!code || !code.length > 0) return user;
 
                 const twoFactor = await this.Authentication.verifyEmailOtp(user.authCookie, code);
-                console.log(twoFactor);
+                this.#Debug(twoFactor);
                 if(!twoFactor.success) return user;
 
                 const auth = await this.Authenticate({
@@ -730,9 +745,9 @@ class Vrchat {
         this.#authCookie = authCookie;
         this.#twoFactorAuth = twoFactorAuth;
 
-        this.Events = new Events({ userid: user.json.id,authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.Authentication = new Authentication({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.User = new User({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.Events = new EventsApi({ userid: user.json.id,authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.Authentication = new AuthenticationApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.Users = new UsersApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
 
         return user; // success :)
     }
@@ -750,12 +765,12 @@ class Vrchat {
         this.#authCookie = "";
         this.#twoFactorAuth = "";
 
-        this.Authentication = new Authentication();
-        this.User = new User();
+        this.Events = new EventsApi();
+        this.Authentication = new AuthenticationApi();
+        this.Users = new UsersApi();
 
         return { success: true };
     }
 }
 
-module.exports = Vrchat;
-module.exports = { Vrchat, Authentication, User, Events };
+module.exports = { Vrchat, EventType, EventsApi, AuthenticationApi, UsersApi };
