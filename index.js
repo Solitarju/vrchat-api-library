@@ -734,10 +734,6 @@ class Vrchat {
 
         return { success: true };
     }
-}
+};
 
-exports.Vrchat = Vrchat;
-exports.EventType = EventType;
-exports.EventsApi = EventsApi;
-exports.AuthenticationApi = AuthenticationApi;
-exports.UsersApi = UsersApi;
+module.exports = { Vrchat, EventType, EventsApi, AuthenticationApi, UsersApi };

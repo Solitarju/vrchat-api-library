@@ -1,7 +1,4 @@
 # Node VRChat API Library
-
-***Updated docs and readme soon™***
-
 [Join the Discord server for support or any other inqueries!](https://discord.gg/cfdjj7TbaF)
 
 Easy to build Node.JS applications using [vrchat-api-library](https://www.npmjs.com/package/vrchat-api-library).
@@ -14,7 +11,8 @@ Easy to build Node.JS applications using [vrchat-api-library](https://www.npmjs.
 - [Usage Examples](#example-code)
 - [TODO](#todo)
 
-**Built according to the [Unofficial VRChat API Docs](https://vrchatapi.github.io/docs/api/)**
+**Built according to the [Unofficial VRChat API Docs](https://vrchatapi.github.io/docs/api/)**.  
+
 Currently only 2 out of 15 major parts of the documented API have been developed in this library, but it also includes **websockets** allowing for real-time constant communication between clients and VRChat's backend.
 
 ### **Disclaimer**  
@@ -244,6 +242,14 @@ async function Main() {
 - OSC (Potentially).
 
 ### **Changelog**
+- v1.0.8
+    - Added the last changelog version since I got carried away in markdown and forgot.
+    - Removed typescript declarations because it removes auto-complete/intellisense and completely broke me for an hour trying to work out what was broken.
+    - Changed exports back.
+    - Help. (joking)
+
+- v1.0.7
+    - Markdown changes last second lmao.
 
 - v1.0.6
     - Updated & more re-usable header generation and removed the apiKey parameter as it is no longer required.
