@@ -1,6 +1,6 @@
 {
   "name": "vrchat-api-library",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Node VRChat REST API library for ease-of-use interacting with VRChats unofficial API and websockets.",
   "main": "index.js",
   "types": "declarations.d.ts",

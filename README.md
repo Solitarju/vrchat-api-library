@@ -2,22 +2,20 @@
 
 ***Updated docs and readme soon™***
 
-[Join the Discord server for support or other queries!](https://discord.gg/cfdjj7TbaF)
+[Join the Discord server for support or any other inqueries!](https://discord.gg/cfdjj7TbaF)
 
 Easy to build Node.JS applications using [vrchat-api-library](https://www.npmjs.com/package/vrchat-api-library).
 
-Vrchat-api-library is a node library around the VRChat REST API as documented in the [*Unofficial* VRChat API docs](https://vrchatapi.github.io/docs/api/).  
-Currently only 2 out of 15 major parts of the documented API have been developed in this library, but it also includes **websockets** allowing for real-time constant communication between clients and VRChat's backend.
-
-This isn't complete yet I will be working on it over time to complete 100% coverage + websockets and maybe OSC, but most importantly I will try to get this updated so it is functional, stable and up to date with VRChat's backend.  
-
 - [Disclaimer](#disclaimer)
-- [TODO](#todo)
 - [Installation](#installation)  
 - [Getting Started](#getting-started)
 - [Classes/API Coverage](#classesapi-coverage)
 - [Functions](#functions)
 - [Usage Examples](#example-code)
+- [TODO](#todo)
+
+**Built according to the [Unofficial VRChat API Docs](https://vrchatapi.github.io/docs/api/)**
+Currently only 2 out of 15 major parts of the documented API have been developed in this library, but it also includes **websockets** allowing for real-time constant communication between clients and VRChat's backend.
 
 ### **Disclaimer**  
 
@@ -40,11 +38,6 @@ Use of the API using applications other than the approved methods (website, VRCh
 - Do not make queries to the API more than once per 60 seconds.
 - Abuse of the API may result in account termination.
 - Access to API endpoints may break at any given time, with no warning.
-
-### **TODO**
-- 100% Coverage of the API documented on the [Unofficial API Docs](https://vrchatapi.github.io/docs/api/).
-- User Class instead of raw JSON.
-- OSC (Potentially).
 
 ### **Installation**
 ```
@@ -244,6 +237,11 @@ async function Main() {
     const userInformation = await vrchat.Users.UpdateUserInfo({ email: "email@example.com", birthday: "1970-01-01", tags: [ "tag1", "tag2" ], status: "active", statusDescription: "statusDescription", bio: "example bio", bioLinks: [ "link1", "link2" ] }); // Updates user information.
 }
 ```
+
+### **TODO**
+- 100% Coverage of the API documented on the [Unofficial API Docs](https://vrchatapi.github.io/docs/api/).
+- User Class instead of raw JSON.
+- OSC (Potentially).
 
 ### **Changelog**
 
