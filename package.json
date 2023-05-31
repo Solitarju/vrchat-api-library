@@ -1,8 +1,18 @@
 {
   "name": "vrchat-api-library",
-  "version": "1.0.5",
-  "description": "Unofficial API that provides an easier way for developers to interact with the VRChat REST API and websockets.",
+  "version": "1.0.6",
+  "description": "Node VRChat REST API library for ease-of-use interacting with VRChats unofficial API and websockets.",
   "main": "index.js",
+  "types": "declarations.d.ts",
+  "keywords": [
+    "vrchat",
+    "api",
+    "library",
+    "websocket",
+    "events",
+    "authentication",
+    "osc"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

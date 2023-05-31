@@ -82,6 +82,16 @@ class EventsApi {
         console.log(x);
     }
 
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
     #HeartBeat() {
         clearTimeout(this.#PingTimeout);
 
@@ -101,19 +111,15 @@ class EventsApi {
     Connect() {
         if(!this.#authCookie) return { success: false, status: 401 };
 
-        this.#WebsocketClient = new WebSocket(`wss://vrchat.com/?authToken=${this.#authCookie}`, { headers: { "cookie": `auth=${this.#authCookie};${this.#twoFactorAuth ? " " + "twoFactorAuth=" + this.#twoFactorAuth + ";" : ""} apiKey=undefined`, "user-agent": "node-vrchat-api/1.0.0a" } });
+        this.#WebsocketClient = new WebSocket(`wss://vrchat.com/?authToken=${this.#authCookie}`, { headers: { "cookie": `auth=${this.#authCookie};${this.#twoFactorAuth ? " " + "twoFactorAuth=" + this.#twoFactorAuth + ";" : ""}`, "user-agent": "node-vrchat-api/1.0.6 contact@solitarju.uk" } });
 
         // Handler for user online/offline events.
         var UserEvent = async (content) => {
             clearInterval(this.OnlineInterval);
             this.OnlineInterval = setInterval(async () => {
                 this.#Debug("ONLINE INTERVAL TIMEOUT");
-                const Headers = new fetch.Headers({
-                    "User-Agent": "node-vrchat-api/1.0.0a",
-                    "cookie": `auth=${this.#authCookie}; ${this.#twoFactorAuth.length > 0 ? `twoFactorAuth=${this.#twoFactorAuth}; ` : ""}apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26;`
-                });
         
-                const res = await fetch(`https://api.vrchat.cloud/api/1/users/${this.#userid}`, { headers: Headers });
+                const res = await fetch(`https://api.vrchat.cloud/api/1/users/${this.#userid}`, { headers: this.#GenerateHeaders(true) });
                 if(!res.ok) {
                     clearInterval(this.OnlineInterval);
                     
@@ -133,13 +139,8 @@ class EventsApi {
 
             if(this.#IsOnline === false) {
                 this.#IsOnline = true;
-
-                const Headers = new fetch.Headers({
-                    "User-Agent": "node-vrchat-api/1.0.0a",
-                    "cookie": `auth=${this.#authCookie}; ${this.#twoFactorAuth.length > 0 ? `twoFactorAuth=${this.#twoFactorAuth}; ` : ""}apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26;`
-                });
         
-                const res = await fetch(`https://api.vrchat.cloud/api/1/users/${this.#userid}`, { headers: Headers });
+                const res = await fetch(`https://api.vrchat.cloud/api/1/users/${this.#userid}`, { headers: this.#GenerateHeaders(true) });
                 if(!res.ok) {
                     this.#EventEmitter.emit('user-online', content);
                     return;
@@ -270,6 +271,16 @@ class AuthenticationApi {
         console.log(x);
     }
 
+    #GenerateHeaders(authentication = false, contentType = "", authCookie = "", twoFactorAuth = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "cookie": `${(this.#authCookie || authCookie) && authentication ? "auth=" + (authCookie ? authCookie : this.#authCookie) + "; " : ""}${(this.#twoFactorAuth || twoFactorAuth) && authentication ? "twoFactorAuth=" + (twoFactorAuth ? twoFactorAuth : this.#twoFactorAuth) + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
     /**
      * 
      * Checks if a user exists on vrchat by using email, username or displayname (prioritizes that order).
@@ -279,15 +290,10 @@ class AuthenticationApi {
     async UserExists({ email = "", username = "", displayName = "", excludeUserId = ""} = {}) {
         if(!email.length > 0 && !displayName.length > 0 && !username.length > 0) throw Error('Missing argument(s) email, displayName or userId');
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a", 
-            "cookie": "apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26"
-        });
-
         const exclusion = excludeUserId.length > 0 ? `&excludeUserId=${excludeUserId}` : "";
 
         if(email.length > 0) {
-            const res = await fetch(`${this.#APIEndpoint}/auth/exists?email=${email}${exclusion}`, { headers:  headers });
+            const res = await fetch(`${this.#APIEndpoint}/auth/exists?email=${email}${exclusion}`, { headers:  this.#GenerateHeaders() });
             if(!res.ok) return { success: false, status: res.status };
 
             const json = await res.json();
@@ -295,7 +301,7 @@ class AuthenticationApi {
         }
 
         if(username.length > 0) {
-            const res = await fetch(`${this.#APIEndpoint}/auth/exists?username=${username}${exclusion}`, { headers:  headers });
+            const res = await fetch(`${this.#APIEndpoint}/auth/exists?username=${username}${exclusion}`, { headers:  this.#GenerateHeaders() });
             if(!res.ok) return { success: false, status: res.status };
 
             const json = await res.json();
@@ -303,7 +309,7 @@ class AuthenticationApi {
         }
 
         if(displayName.length > 0) {
-            const res = await fetch(`${this.#APIEndpoint}/auth/exists?displayName=${displayName}${exclusion}`, { headers:  headers });
+            const res = await fetch(`${this.#APIEndpoint}/auth/exists?displayName=${displayName}${exclusion}`, { headers:  this.#GenerateHeaders() });
             if(!res.ok) return { success: false, status: res.status }; 
             
             const json = await res.json();
@@ -323,12 +329,8 @@ class AuthenticationApi {
         }
 
         if(authCookie.length > 0) {
-            const Headers = new fetch.Headers({
-                "User-Agent": "node-vrchat-api/1.0.0a",
-                "cookie": `auth=${authCookie}; ${twoFactorAuth.length > 0 ? `twoFactorAuth=${twoFactorAuth}; ` : ""}apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26;`
-            });
 
-            const res = await fetch(`${this.#APIEndpoint}/auth/user`, { headers: Headers });
+            const res = await fetch(`${this.#APIEndpoint}/auth/user`, { headers: this.#GenerateHeaders(true, "", authCookie, twoFactorAuth) });
             if(!res.ok) {
                 // do this so if invalid authcookie, if username and password credentials are passed it will move on to next statement to try those too.
                 if(!username && !password) return { success: false, status: res.status };
@@ -377,12 +379,7 @@ class AuthenticationApi {
     async GetCurrentUser() {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
 
-        const tokenHeaders = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `auth=${this.#authCookie}; ${this.#twoFactorAuth.length > 0 ? `twoFactorAuth=${this.#twoFactorAuth}; ` : ""}apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26;`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { headers: tokenHeaders });
+        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, json: await res.json() };
@@ -397,13 +394,7 @@ class AuthenticationApi {
     async verifyTotp(authCookie = "", totp = "") {
         if(!authCookie.length > 0 || !totp.length > 0) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "Content-Type": "application/json",
-            "cookie": `auth=${authCookie}` 
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/totp/verify`, { method: "POST", headers: headers, body: JSON.stringify({ "code": totp }) });
+        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/totp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": totp }) });
         if(!res.ok) return { success: false, error: res.status };
 
         const json = await res.json();
@@ -423,13 +414,7 @@ class AuthenticationApi {
     async verifyOtp(authCookie = "", otp = "") {
         if(!authCookie.length > 0 || !otp.length > 0) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "Content-Type": "application/json",
-            "cookie": `auth=${authCookie}` 
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/otp/verify`, { method: "POST", headers: headers, body: JSON.stringify({ "code": otp }) });
+        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/otp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": otp }) });
         if(!res.ok) return { success: false, error: res.status };
 
         const json = await res.json();
@@ -449,13 +434,7 @@ class AuthenticationApi {
     async verifyEmailOtp(authCookie = "", emailotp = "") {
         if(!authCookie.length > 0 || !emailotp.length > 0) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "Content-Type": "application/json",
-            "cookie": `auth=${authCookie};` 
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/emailotp/verify`, { method: "POST", headers: headers, body: JSON.stringify({ code: emailotp }) });
+        const res = await fetch(`${this.#APIEndpoint}/auth/twofactorauth/emailotp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ code: emailotp }) });
         if(!res.ok) return { success: false, error: res.status };
 
         const json = await res.json();
@@ -476,12 +455,7 @@ class AuthenticationApi {
     async VerifyAuthToken(authCookie="") {
         if(!authCookie.length > 0) return { success: true, ok: false };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a", 
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${authCookie}`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/auth`, { headers: headers });
+        const res = await fetch(`${this.#APIEndpoint}/auth`, { headers: this.#GenerateHeaders(true, "", authCookie) });
         if(!res.ok) return { success: false, status: res.status };
         
         const json = await res.json();
@@ -499,12 +473,7 @@ class AuthenticationApi {
     async Logout(authCookie) {
         if(!authCookie) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth="${authCookie}";`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/logout`, { method: "PUT", headers: headers, body: JSON.stringify({ "auth": authCookie }) });
+        const res = await fetch(`${this.#APIEndpoint}/logout`, { method: "PUT", headers: this.#GenerateHeaders(true, "", authCookie), body: JSON.stringify({ "auth": authCookie }) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true };
@@ -545,6 +514,16 @@ class UsersApi {
         console.log(x);
     }
 
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
     /**
      * 
      *  Searches for users by displayname.
@@ -555,12 +534,7 @@ class UsersApi {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
         if(!displayName.length > 0) throw Error("Missing argument displayName.");
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${this.#authCookie};${this.#twoFactorAuth.length > 0 ? " twoFactorAuth=" + this.#twoFactorAuth : ""}`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/users?search=${displayName}${returnAmount > 0 && returnAmount < 100 ? "&n=" + returnAmount : ""}${offset > 0 ? "&offset" + offset : ""}`, { headers: headers });
+        const res = await fetch(`${this.#APIEndpoint}/users?search=${displayName}${returnAmount > 0 && returnAmount < 100 ? "&n=" + returnAmount : ""}${offset > 0 ? "&offset" + offset : ""}`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, json: await res.json() };
@@ -576,12 +550,7 @@ class UsersApi {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
         if(!userid.length > 0) throw Error("Missing argument userid.");
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${this.#authCookie};${this.#twoFactorAuth.length > 0 ? " twoFactorAuth=" + this.#twoFactorAuth : ""}`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: headers });
+        const res = await fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, json: await res.json() };
@@ -597,12 +566,6 @@ class UsersApi {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
         if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) throw Error("Missing argument userInfo JSON.");
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${this.#authCookie};${this.#twoFactorAuth.length > 0 ? " twoFactorAuth=" + this.#twoFactorAuth : ""}`,
-            "Content-Type": "application/json"
-        });
-
         tags.length > 0 ? tags : tags = false;
         bioLinks.length > 0 ? bioLinks : bioLinks = false;
 
@@ -612,7 +575,7 @@ class UsersApi {
             if(userArgsArr[i]) userInfoJSON[["email", "birthday", "tags", "status", "statusDescription", "bio", "bioLinks"][i]] = `${userArgsArr[i]}`;
         }
 
-        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { method: "PUT", headers: headers, body: JSON.stringify(userInfoJSON) });
+        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { method: "PUT", headers: this.#GenerateHeaders(true, "application/json"), body: JSON.stringify(userInfoJSON) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, user: await res.json() };
@@ -627,12 +590,7 @@ class UsersApi {
     async GetUserGroups() {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${this.#authCookie};${this.#twoFactorAuth.length > 0 ? " twoFactorAuth=" + this.#twoFactorAuth : ""}`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups`, { headers: headers });
+        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, groups: await res.json() };
@@ -647,12 +605,7 @@ class UsersApi {
     async GetUserGroupRequests() {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
 
-        const headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.0a",
-            "cookie": `apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth=${this.#authCookie};${this.#twoFactorAuth.length > 0 ? " twoFactorAuth=" + this.#twoFactorAuth : ""}`
-        });
-
-        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups/requested`, { headers: headers });
+        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups/requested`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
 
         return { success: true, groups: await res.json() };
@@ -679,6 +632,16 @@ class Vrchat {
     #Debug(x) {
         if(!this.#debug === true) return;
         console.log(x);
+    }
+
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
     }
 
     /**
@@ -773,4 +736,8 @@ class Vrchat {
     }
 }
 
-module.exports = { Vrchat, EventType, EventsApi, AuthenticationApi, UsersApi };
+exports.Vrchat = Vrchat;
+exports.EventType = EventType;
+exports.EventsApi = EventsApi;
+exports.AuthenticationApi = AuthenticationApi;
+exports.UsersApi = UsersApi;
