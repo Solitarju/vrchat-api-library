@@ -53,6 +53,66 @@ class EventType {
     }
 }
 
+class QueryOrder {
+
+    static ascending = new QueryOrder("ascending");
+    static descending = new QueryOrder("descending");
+
+    constructor(type) {
+        this.type = type;
+    }
+}
+
+class QuerySort {
+
+    static popularity = new QuerySort("popularity");
+    static heat = new QuerySort("heat");
+    static trust = new QuerySort("trust");
+    static shuffle = new QuerySort("shuffle");
+    static random = new QuerySort("random");
+    static favourites = new QuerySort("favourites");
+    static reportScore = new QuerySort("reportScore");
+    static reportCount = new QuerySort("reportCount");
+    static publicationDate = new QuerySort("publicationDate");
+    static labsPublicationDate = new QuerySort("labsPublicationDate");
+    static created = new QuerySort("created");
+    static _created_at = new QuerySort("_created_at");
+    static updated = new QuerySort("updated");
+    static _updated_at = new QuerySort("_updated_at");
+    static order = new QuerySort("order");
+    static relevance = new QuerySort("relevance");
+    static magic = new QuerySort("magic");
+    static name = new QuerySort("name");
+
+    constructor(type) {
+        this.type = type;
+    }
+}
+
+class QueryReleaseStatus {
+
+    static public = new QueryReleaseStatus("public");
+    static private = new QueryReleaseStatus("private");
+    static hidden = new QueryReleaseStatus("hidden");
+    static all = new QueryReleaseStatus("all");
+
+    constructor(type) {
+        this.type = type;
+    }
+}
+
+class Enums {
+
+    static EventType = EventType;
+    static QueryOrder = QueryOrder;
+    static QuerySort = QuerySort;
+    static QueryReleaseStatus = QueryReleaseStatus;
+
+    constructor() {
+
+    }
+}
+
 class EventsApi {
 
     #userid = "";
@@ -84,7 +144,7 @@ class EventsApi {
 
     #GenerateHeaders(authentication = false, contentType = "") {
         var headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
             "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
         });
 
@@ -111,7 +171,7 @@ class EventsApi {
     Connect() {
         if(!this.#authCookie) return { success: false, status: 401 };
 
-        this.#WebsocketClient = new WebSocket(`wss://vrchat.com/?authToken=${this.#authCookie}`, { headers: { "cookie": `auth=${this.#authCookie};${this.#twoFactorAuth ? " " + "twoFactorAuth=" + this.#twoFactorAuth + ";" : ""}`, "user-agent": "node-vrchat-api/1.0.6 contact@solitarju.uk" } });
+        this.#WebsocketClient = new WebSocket(`wss://vrchat.com/?authToken=${this.#authCookie}`, { headers: { "cookie": `auth=${this.#authCookie};${this.#twoFactorAuth ? " " + "twoFactorAuth=" + this.#twoFactorAuth + ";" : ""}`, "user-agent": "node-vrchat-api/1.0.9 contact@solitarju.uk" } });
 
         // Handler for user online/offline events.
         var UserEvent = async (content) => {
@@ -160,6 +220,7 @@ class EventsApi {
             this.#Debug("OPEN");
             this.#HeartBeat();
         });
+        
         this.#WebsocketClient.on('close', () => {
             this.#Debug('CLOSE');
         });
@@ -273,7 +334,7 @@ class AuthenticationApi {
 
     #GenerateHeaders(authentication = false, contentType = "", authCookie = "", twoFactorAuth = "") {
         var headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
             "cookie": `${(this.#authCookie || authCookie) && authentication ? "auth=" + (authCookie ? authCookie : this.#authCookie) + "; " : ""}${(this.#twoFactorAuth || twoFactorAuth) && authentication ? "twoFactorAuth=" + (twoFactorAuth ? twoFactorAuth : this.#twoFactorAuth) + "; " : ""}`
         });
 
@@ -507,6 +568,7 @@ class UsersApi {
         this.#userid = userid;
         this.#authCookie = authCookie;
         this.#twoFactorAuth = twoFactorAuth;
+        this.#debug = debug;
     }
 
     #Debug(x) {
@@ -516,7 +578,7 @@ class UsersApi {
 
     #GenerateHeaders(authentication = false, contentType = "") {
         var headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
             "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
         });
 
@@ -526,7 +588,7 @@ class UsersApi {
 
     /**
      * 
-     *  Searches for users by displayname.
+     * Searches for users by displayname.
      * 
      * @returns {Promise<JSON>} Queries for users and returns user object.
      */
@@ -585,7 +647,7 @@ class UsersApi {
      * 
      * Gets current users groups.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<JSON>} Returns JSON array of current users groups.
      */
     async GetUserGroups() {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
@@ -600,7 +662,7 @@ class UsersApi {
      * 
      * Gets current user group requests.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<JSON>} Returns JSON array of current users group requests.
      */
     async GetUserGroupRequests() {
         if(!this.#authCookie.length > 0) return { success: false, status: 401 };
@@ -613,6 +675,354 @@ class UsersApi {
 
 }
 
+class FriendsApi {
+
+    #APIEndpoint = "https://api.vrchat.cloud/api/1";
+    #userid = "";
+    #authCookie = "";
+    #twoFactorAuth = "";
+    #debug = false;
+
+    constructor({ userid = "", authCookie = "", twoFactorAuth = "", debug = false} = {}) {
+        if(!authCookie.length > 0) return this;
+
+        this.#userid = userid;
+        this.#authCookie = authCookie;
+        this.#twoFactorAuth = twoFactorAuth;
+        this.#debug = debug;
+    }
+
+    #Debug(x) {
+        if(!this.#debug === true) return;
+        console.log(x);
+    }
+
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
+    #GenerateParameters(params = {}) {
+        var paramString = "";
+        Object.keys(params).forEach((key) => {
+            var value = params[key];
+            if(!value) return;
+            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
+            
+            if(paramString) {
+                paramString += `&${key}=${value}`;
+                return;
+            }
+
+            paramString += `${key}=${value}`;
+        });
+        return paramString;
+    }
+
+    /**
+     * 
+     * List online/offline friends.
+     * 
+     * @returns {Promise<JSON>} Returns JSON array of friends as user object by offline query.
+     */
+    async ListFriends({ offset = 0, n = 60, offline = false } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ offset, n, offline });
+        const res = await fetch(`${this.#APIEndpoint}/auth/user/friends${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    async CheckFriendStatus(userId = "") {
+        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!userId) return { success: false, status: 400 };
+
+        const res = await fetch(`${this.#APIEndpoint}/user/${userId}/friendStatus`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+}
+
+class WorldsApi {
+
+    #APIEndpoint = "https://api.vrchat.cloud/api/1";
+    #userid = "";
+    #authCookie = "";
+    #twoFactorAuth = "";
+    #debug = false;
+
+    constructor({ userid = "", authCookie = "", twoFactorAuth = "", debug = false} = {}) {
+        if(!authCookie.length > 0) return this;
+
+        this.#userid = userid;
+        this.#authCookie = authCookie;
+        this.#twoFactorAuth = twoFactorAuth;
+        this.#debug = debug;
+    }
+
+    #Debug(x) {
+        if(!this.#debug === true) return;
+        console.log(x);
+    }
+
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
+    #GenerateParameters(params = {}) {
+        var paramString = "";
+        Object.keys(params).forEach((key) => {
+            var value = params[key];
+            if(!value) return;
+            if(value === QuerySort) return;
+            if(value === QueryOrder) return;
+            if(value === QueryReleaseStatus) return;
+
+            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
+            if(key === "user" && value === true) value = "me";
+            if(key === "sort" && value instanceof QuerySort) value = value.type;
+            if(key === "order" && value instanceof QueryOrder) value = value.type;
+            if(key === "releaseStatus" && value instanceof QueryReleaseStatus) value = value.type;
+            
+            if(paramString) {
+                paramString += `&${key}=${value}`;
+                return;
+            }
+
+            paramString += `${key}=${value}`;
+        });
+        return paramString;
+    }
+
+    /**
+     * 
+     * Search and list any worlds by query filters.
+     * 
+     * @returns {Promise<JSON>} Returns JSON array of worlds by query.
+     */
+    async SearchAllWorlds({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
+        const res = await fetch(`${this.#APIEndpoint}/worlds${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Get information about a specific World. Works unauthenticated but when so will always return 0 for certain fields.
+     * 
+     * @returns {Promise<JSON>} Returns JSON object of world.
+     */
+    async GetWorldById(id = "") {
+        const res = await fetch(`${this.#APIEndpoint}/worlds/${id}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Retreive world instance.
+     * 
+     * @returns {Promise<JSON>} Returns JSON object of world instace.
+     */
+    async GetWorldInstance(worldId = "", instanceId = "") {
+        if(!this.#authCookie) return { success: false, status: 401 }
+        if(!worldId || !instanceId) return { success: false, status: 400 };
+
+        const res = await fetch(`${this.#APIEndpoint}/worlds/${worldId}/${instanceId}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Search and list recently visited worlds by query filters.
+     * 
+     * @returns {Promise<JSON>} Returns JSON array of recent worlds by query filters.
+     */
+    async ListRecentWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
+        const res = await fetch(`${this.#APIEndpoint}/worlds/recent${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Search and list favorited worlds by query filters.
+     * 
+     * @returns {Promise<JSON>} Returns JSON array of current users favourited worlds.
+     */
+    async ListFavouritedWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
+        const res = await fetch(`${this.#APIEndpoint}/worlds/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Search and list currently Active worlds by query filters.
+     * 
+     * @returns {Promise<JSON>} Returns JSON array of active worlds.
+     */
+    async ListActiveWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
+        const res = await fetch(`${this.#APIEndpoint}/worlds/active${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+}
+
+class AvatarsApi {
+
+    #APIEndpoint = "https://api.vrchat.cloud/api/1";
+    #userid = "";
+    #authCookie = "";
+    #twoFactorAuth = "";
+    #debug = false;
+
+    constructor({ userid = "", authCookie = "", twoFactorAuth = "", debug = false} = {}) {
+        if(!authCookie.length > 0) return this;
+
+        this.#userid = userid;
+        this.#authCookie = authCookie;
+        this.#twoFactorAuth = twoFactorAuth;
+        this.#debug = debug;
+    }
+
+    #Debug(x) {
+        if(!this.#debug === true) return;
+        console.log(x);
+    }
+
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new fetch.Headers({
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
+    }
+
+    #GenerateParameters(params = {}) {
+        var paramString = "";
+        Object.keys(params).forEach((key) => {
+            var value = params[key];
+            if(!value) return;
+            if(value === QuerySort) return;
+            if(value === QueryOrder) return;
+            if(value === QueryReleaseStatus) return;
+
+            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
+            if(key === "user" && value === true) value = "me";
+            if(key === "sort" && value instanceof QuerySort) value = value.type;
+            if(key === "order" && value instanceof QueryOrder) value = value.type;
+            if(key === "releaseStatus" && value instanceof QueryReleaseStatus) value = value.type;
+            
+            if(paramString) {
+                paramString += `&${key}=${value}`;
+                return;
+            }
+
+            paramString += `${key}=${value}`;
+        });
+        return paramString;
+    }
+
+    /**
+     * 
+     * Get the current avatar for the user.
+     * 
+     * @returns {Promise<JSON>} Returns JSON object of currently worn avatar.
+     */
+    async GetOwnAvatar() {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const res = await fetch(`${this.#APIEndpoint}/users/${this.#userid}/avatar`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Searches all of vrchat's publicly available avatars according to paramaters.
+     * 
+     * @returns {Promise<JSON>} Returns array of avatar JSON objects.
+     */
+    async SearchAllAvatars({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
+        const res = await fetch(`${this.#APIEndpoint}/avatars${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        console.log(`${this.#APIEndpoint}/avatars${params ? "?" + params : ""}`);
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Gets avatar information from avatar id.
+     * 
+     * @returns {Promise<JSON>} Returns avatar JSON object.
+     */
+    async GetAvatar(avatarId) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const res = await fetch(`${this.#APIEndpoint}/avatars/${avatarId}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+
+    /**
+     * 
+     * Lists all favourited avatars of currently authenticated user.
+     * 
+     * @returns {Promise<JSON>} Returns JSON with all favourited avatar.
+     */
+    async ListFavouritedAvatars({ featured = true, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
+        if(!this.#authCookie) return { success: false, status: 401 };
+
+        const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
+        const res = await fetch(`${this.#APIEndpoint}/avatars/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        if(!res.ok) return { success: false, status: res.status };
+
+        return { success: true, res: await res.json() };
+    }
+}
+
 class Vrchat {
 
     #APIEndpoint = "https://api.vrchat.cloud/api/1";
@@ -621,9 +1031,12 @@ class Vrchat {
     #twoFactorAuth = "";
     #debug = false;
 
-    Events = new EventsApi();
-    Authentication = new AuthenticationApi();
-    Users = new UsersApi();
+    EventsApi = new EventsApi();
+    AuthenticationApi = new AuthenticationApi();
+    UsersApi = new UsersApi();
+    FriendsApi = new FriendsApi();
+    WorldsApi = new WorldsApi();
+    AvatarsApi = new AvatarsApi();
 
     constructor(debug = false) {
         this.#debug = debug;
@@ -636,7 +1049,7 @@ class Vrchat {
 
     #GenerateHeaders(authentication = false, contentType = "") {
         var headers = new fetch.Headers({
-            "User-Agent": "node-vrchat-api/1.0.6 contact@solitarju.uk",
+            "User-Agent": "node-vrchat-api/1.0.9 contact@solitarju.uk",
             "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
         });
 
@@ -654,7 +1067,7 @@ class Vrchat {
     async Authenticate({username = "", password = "", authCookie = "", twoFactorAuth = ""} = {}, twoFactorCallback) {
         if((!username.length > 0 || !password.length > 0) && (!authCookie.length > 0)) return false;
 
-        const user = await this.Authentication.Login({ username: username, password: password, authCookie: authCookie, twoFactorAuth: twoFactorAuth });
+        const user = await this.AuthenticationApi.Login({ username: username, password: password, authCookie: authCookie, twoFactorAuth: twoFactorAuth });
 
         if(!user.success) {
             if(!user.json) return user;
@@ -666,7 +1079,7 @@ class Vrchat {
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'emailotp') {
                 if(!code || !code.length > 0) return user;
 
-                const twoFactor = await this.Authentication.verifyEmailOtp(user.authCookie, code);
+                const twoFactor = await this.AuthenticationApi.verifyEmailOtp(user.authCookie, code);
                 this.#Debug(twoFactor);
                 if(!twoFactor.success) return user;
 
@@ -680,7 +1093,7 @@ class Vrchat {
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'totp') {
                 if(!code || !code.length > 0) return user;
 
-                const twoFactor = await this.Authentication.verifyTotp(user.authCookie, code);
+                const twoFactor = await this.AuthenticationApi.verifyTotp(user.authCookie, code);
                 if(!twoFactor.success) return user;
 
                 const auth = await this.Authenticate({
@@ -693,7 +1106,7 @@ class Vrchat {
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'otp') {
                 if(!code || !code.length > 0) return user;
 
-                const twoFactor = await this.Authentication.verifyOtp(user.authCookie, code);
+                const twoFactor = await this.AuthenticationApi.verifyOtp(user.authCookie, code);
                 if(!twoFactor.success) return user;
 
                 const auth = await this.Authenticate({
@@ -708,9 +1121,12 @@ class Vrchat {
         this.#authCookie = authCookie;
         this.#twoFactorAuth = twoFactorAuth;
 
-        this.Events = new EventsApi({ userid: user.json.id,authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.Authentication = new AuthenticationApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.Users = new UsersApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.EventsApi = new EventsApi({ userid: user.json.id,authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.AuthenticationApi = new AuthenticationApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.UsersApi = new UsersApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.FriendsApi = new FriendsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.WorldsApi = new WorldsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.AvatarsApi = new AvatarsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
 
         return user; // success :)
     }
@@ -728,12 +1144,15 @@ class Vrchat {
         this.#authCookie = "";
         this.#twoFactorAuth = "";
 
-        this.Events = new EventsApi();
-        this.Authentication = new AuthenticationApi();
-        this.Users = new UsersApi();
+        this.EventsApi = new EventsApi();
+        this.AuthenticationApi = new AuthenticationApi();
+        this.UsersApi = new UsersApi();
+        this.FriendsApi = new FriendsApi();
+        this.WorldsApi = new WorldsApi();
+        this.AvatarsApi = new AvatarsApi();
 
         return { success: true };
     }
 };
 
-module.exports = { Vrchat, EventType, EventsApi, AuthenticationApi, UsersApi };
+module.exports = { Vrchat, AuthenticationApi, EventsApi, UsersApi, FriendsApi, WorldsApi, AvatarsApi, Enums };

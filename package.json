@@ -1,7 +1,7 @@
 {
   "name": "vrchat-api-library",
-  "version": "1.0.8",
-  "description": "Node VRChat REST API library for ease-of-use interacting with VRChats unofficial API and websockets.",
+  "version": "1.0.9",
+  "description": "🔥🔥 Node VRChat API library for ease-of-use interacting with VRChat's unofficial API and websocket events. ✅✅",
   "main": "index.js",
   "keywords": [
     "vrchat",
@@ -16,7 +16,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Solitarju",
-  "license": "GNU General Public License v3.0",
+  "license": "GPL-3.0",
   "dependencies": {
     "node-fetch": "^2.6.9",
     "ws": "^8.13.0"
