@@ -185,6 +185,9 @@ async function Main() {
 - OSC (Potentially).
 
 ### **Changelog**
+- v1.1.0
+    - Simple fix for pretty major authentication bug on "Vrchat" manager class.
+    
 - v1.0.9
     - Added functionality for FriendsApi, WorldsApi & AvatarsApi to an extent.
     - Renamed classes to include 'Api' such as 'AuthenticationApi' including managed classes under the 'Vrchat' class.
