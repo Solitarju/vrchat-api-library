@@ -1118,15 +1118,15 @@ class Vrchat {
         }
 
         this.#userid = user.json.id;
-        this.#authCookie = authCookie;
-        this.#twoFactorAuth = twoFactorAuth;
+        this.#authCookie = user.authCookie;
+        this.#twoFactorAuth = user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "";
 
-        this.EventsApi = new EventsApi({ userid: user.json.id,authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.AuthenticationApi = new AuthenticationApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.UsersApi = new UsersApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.FriendsApi = new FriendsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.WorldsApi = new WorldsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
-        this.AvatarsApi = new AvatarsApi({ userid: user.json.id, authCookie: authCookie, twoFactorAuth: twoFactorAuth, debug: this.#debug });
+        this.EventsApi = new EventsApi({ userid: user.json.id,authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
+        this.AuthenticationApi = new AuthenticationApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
+        this.UsersApi = new UsersApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
+        this.FriendsApi = new FriendsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
+        this.WorldsApi = new WorldsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
+        this.AvatarsApi = new AvatarsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: user["twoFactorAuth"] ? user.twoFactorAuth : twoFactorAuth ? twoFactorAuth : "", debug: this.#debug });
 
         return user; // success :)
     }
