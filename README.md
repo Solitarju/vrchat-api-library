@@ -2,6 +2,7 @@
 [Join the Discord server for support or any other inqueries!](https://discord.gg/cfdjj7TbaF)
 
 Easy VRChat integration to your Node.JS applications using [vrchat-api-library](https://www.npmjs.com/package/vrchat-api-library), also with realtime events using websockets!  
+
 Built according to the [**Unofficial VRChat API Docs**](https://vrchatapi.github.io/docs/api/).
 
 - [Disclaimer](#disclaimer)
@@ -103,7 +104,7 @@ async function Main() {
 ```
 
 ### **Usage**  
-This should give enough information to get started with pretty much all points of the API, although if you find yourself needed further assistance don't hesitate to join the discord.
+This should give enough information to get started with pretty much all points of the API, although if you find yourself needing further assistance don't hesitate to join the discord.
 ```javascript
 // Require the necessary vrchat-api-library classes
 const { VRChat, EventsApi, AuthenticationApi, AvatarsApi, EconomyApi, FavoritesApi, FilesApi, FriendsApi, GroupsApi, InviteApi, InstancesApi, NotificationsApi, PermissionsApi, PlayerModerationApi, SystemApi, UsersApi, WorldsApi, Enums } = require('vrchat-api-library');
@@ -112,7 +113,7 @@ async function GetOTP() {
     // Return OTP/One Time Password as string
 }
 
-// NOTE: Some functions may be used without authentication, but the majority will throw a 401 (Unauthorized/Invalid Credentials) HTTP Error.
+// Some functions may be used without authentication, but the majority will throw a 401 (Unauthorized/Invalid Credentials) HTTP Error.
 const vrchat = new VRChat(); // Create VRChat object.
 
 // You can provide both username & password and/or authCookie with twoFactorAuth if needed, will use authCookie first, if authCookie invalid will fallback to username & password.
@@ -177,7 +178,6 @@ console.log(vrchat.AuthenticationApi.GetAuthentication());
     - Custom "user-online" & "user-offline" events.
     - Completely undocumented so expect some missing coverage **(Still functions if you know the event type, you can just pass it as a string)** but completely stable and modular.
 - Class: **AuthenticationApi**
-    - Reusable session credentials so you don't get session limited.
 - Class: **AvatarsApi**
 - Class: **EconomyApi**
 - Class: **FavoritesApi**
@@ -193,17 +193,18 @@ console.log(vrchat.AuthenticationApi.GetAuthentication());
 - Class: **UsersApi**
 - Class: **WorldsApi**
 - Class: **Enums**
-    - Enums class containing all enum types.
 
 ### **TODO**
 - (Important) Optional argument fixes. (If a falsy value is passed, the function will omit that value and not specify it in the api request resulting in it returning to default instead).
 - Wiki/Documentation.
-- Consistency improvements.
-- Separate classes into their own modules for better organization.
+- Code Consistency/General improvements.
 - User Class instead of raw JSON.
 - OSC (Potentially).
 
 ### **Changelog**
+- v1.2.1
+    - Sorted each API section into their own modules for better orginization.
+
 - v1.2.0
     - Finally completed 100% API coverage!
     - Renamed "Vrchat" manager class to "VRChat".
