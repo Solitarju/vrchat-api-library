@@ -30,7 +30,6 @@ const { EconomyApi } = require('./classes/EconomyApi.js');
 const { FavoritesApi } = require('./classes/FavouritesApi.js');
 const { FilesApi } = require('./classes/FilesApi.js');
 const { FriendsApi } = require('./classes/FriendsApi.js');
-
 const { GroupsApi } = require('./classes/GroupsApi.js');
 const { InviteApi } = require('./classes/InviteApi.js');
 const { InstancesApi } = require('./classes/InstancesApi.js');
@@ -41,7 +40,7 @@ const { SystemApi } = require('./classes/SystemApi.js');
 const { UsersApi } = require('./classes/UsersApi.js');
 const { WorldsApi } = require('./classes/WorldsApi.js');
 
-const UserAgent = "node-vrchat-api/1.2.1 contact@solitarju.uk";
+const UserAgent = "node-vrchat-api/1.2.2 contact@solitarju.uk";
 
 class VRChat {
 

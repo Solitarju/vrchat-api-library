@@ -13,7 +13,7 @@ Built according to the [**Unofficial VRChat API Docs**](https://vrchatapi.github
 - [TODO](#todo)
 - [Changelog](#changelog)
 
-### **Disclaimer**  *(From the community driven VRChat API docs)*
+## **Disclaimer**
 Use of the API using applications other than the approved methods (website, VRChat application) are not officially supported. You may use the API for your own application, but keep these guidelines in mind:
 
 - We do not provide documentation or support for the API.
@@ -21,13 +21,13 @@ Use of the API using applications other than the approved methods (website, VRCh
 - Abuse of the API may result in account termination.
 - Access to API endpoints may break at any given time, with no warning.
 
-### **Installation**
+## **Installation**
 Install via npm using:
 ```
 npm install vrchat-api-library
 ```
 
-### **Getting Started**  
+## **Getting Started**  
 
 ```javascript
 const { VRChat, EventsApi, AuthenticationApi, AvatarsApi, EconomyApi, FavoritesApi, FilesApi, FriendsApi, GroupsApi, InviteApi, InstancesApi, NotificationsApi, PermissionsApi, PlayerModerationApi, SystemApi, UsersApi, WorldsApi, Enums } = require('vrchat-api-library'); // Require the classes you need, or all of them.
@@ -103,7 +103,7 @@ async function Main() {
 }
 ```
 
-### **Usage**  
+## **Usage**  
 This should give enough information to get started with pretty much all points of the API, although if you find yourself needing further assistance don't hesitate to join the discord.
 ```javascript
 // Require the necessary vrchat-api-library classes
@@ -170,7 +170,7 @@ console.log(await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }));
 console.log(vrchat.AuthenticationApi.GetAuthentication());
 ```
 
-### **Classes/API Coverage**
+## **Classes/API Coverage**
 - Class: **VRChat**
     - A Class designed to handle authentication and manage the rest of the library automatically for you.
 - Class: **EventsApi**
@@ -194,14 +194,17 @@ console.log(vrchat.AuthenticationApi.GetAuthentication());
 - Class: **WorldsApi**
 - Class: **Enums**
 
-### **TODO**
+## **TODO**
 - (Important) Optional argument fixes. (If a falsy value is passed, the function will omit that value and not specify it in the api request resulting in it returning to default instead).
 - Wiki/Documentation.
 - Code Consistency/General improvements.
 - User Class instead of raw JSON.
 - OSC (Potentially).
 
-### **Changelog**
+## **Changelog**
+- v1.2.2
+    - Singular markdown change
+
 - v1.2.1
     - Sorted each API section into their own modules for better orginization.
 
