@@ -1,5 +1,5 @@
 /*
-<Nodejs library to interface with the vrchat's backend REST API>
+<VRChat API library for NodeJS>
     Copyright (C) <2023>  <Solitarju> 
 
     This program is free software: you can redistribute it and/or modify
@@ -15,10 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-// RAUERUAURURAUEAURUARUE! Did I scare you? yeah I bet I did, you coward. You make me sick, your weakness is pathetic.
-// Also hello! Why are you poking around inside my source code? :totally_a_flushed_emoji:
-// Coding this made me realise why Typescript exists, also makes me wonder why I haven't learnt it yet.
 
 const fetch = require('node-fetch');
 
@@ -40,12 +36,11 @@ const { SystemApi } = require('./classes/SystemApi.js');
 const { UsersApi } = require('./classes/UsersApi.js');
 const { WorldsApi } = require('./classes/WorldsApi.js');
 
-const UserAgent = "node-vrchat-api/1.2.2 contact@solitarju.uk";
+const UserAgent = "node-vrchat-api/1.2.3 contact@solitarju.uk";
 
 class VRChat {
 
-    #APIEndpoint = "https://api.vrchat.cloud/api/1";
-    #userid = "";
+    #userid = ""; // This is referenced even though greyed out, removing this will break the code.
     #authCookie = "";
     #twoFactorAuth = "";
     #debug = false;
@@ -76,16 +71,6 @@ class VRChat {
         console.log(x);
     }
 
-    #GenerateHeaders(authentication = false, contentType = "") {
-        var headers = new fetch.Headers({
-            "User-Agent": UserAgent,
-            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
-        });
-
-        if(contentType) headers.set('Content-Type', contentType);
-        return headers;
-    }
-
     /**
      * 
      * Takes user details and internally creates new session or uses existing session for later ease of use.
@@ -99,8 +84,7 @@ class VRChat {
         const user = await this.AuthenticationApi.Login({ username: username, password: password, authCookie: authCookie, twoFactorAuth: twoFactorAuth });
 
         if(!user.success) {
-            if(!user.json) return user;
-            if(!user.json.requiresTwoFactorAuth) return user;
+            if(!user.json || !user.json.requiresTwoFactorAuth) return user;
             if(!twoFactorCallback || typeof(twoFactorCallback) !== "function") return user; // bad failures <^^^ :(
 
             const code = await twoFactorCallback(user.json["requiresTwoFactorAuth"]);
@@ -110,6 +94,7 @@ class VRChat {
 
                 const twoFactor = await this.AuthenticationApi.verifyEmailOtp(user.authCookie, code);
                 this.#Debug(twoFactor);
+
                 if(!twoFactor.success) return user;
 
                 const auth = await this.Authenticate({
@@ -147,23 +132,25 @@ class VRChat {
         }
 
         this.#userid = user.json.id;
-        this.#twoFactorAuth = user["twoFactorAuth"] ?? twoFactorAuth ?? "";
+        this.#twoFactorAuth = user["twoFactorAuth"] ? twoFactorAuth : "";
 
-        this.EventsApi = new EventsApi({ userid: user.json.id,authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.AuthenticationApi = new AuthenticationApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.AvatarsApi = new AvatarsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.EconomyApi = new EconomyApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.FavoritesApi = new FavoritesApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.FilesApi = new FilesApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.FriendsApi = new FriendsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.GroupsApi = new GroupsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.InviteApi = new InviteApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.InstancesApi = new InstancesApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.NotificationsApi = new NotificationsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.PermissionsApi = new PermissionsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.PlayerModerationApi = new PlayerModerationApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.UsersApi = new UsersApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
-        this.WorldsApi = new WorldsApi({ userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug }, fetch, UserAgent);
+        var objJson = { userid: user.json.id, authCookie: user.authCookie, twoFactorAuth: this.#twoFactorAuth, debug: this.#debug };
+
+        this.EventsApi = new EventsApi(objJson, fetch, UserAgent);
+        this.AuthenticationApi = new AuthenticationApi(objJson, fetch, UserAgent);
+        this.AvatarsApi = new AvatarsApi(objJson, fetch, UserAgent);
+        this.EconomyApi = new EconomyApi(objJson, fetch, UserAgent);
+        this.FavoritesApi = new FavoritesApi(objJson, fetch, UserAgent);
+        this.FilesApi = new FilesApi(objJson, fetch, UserAgent);
+        this.FriendsApi = new FriendsApi(objJson, fetch, UserAgent);
+        this.GroupsApi = new GroupsApi(objJson, fetch, UserAgent);
+        this.InviteApi = new InviteApi(objJson, fetch, UserAgent);
+        this.InstancesApi = new InstancesApi(objJson, fetch, UserAgent);
+        this.NotificationsApi = new NotificationsApi(objJson, fetch, UserAgent);
+        this.PermissionsApi = new PermissionsApi(objJson, fetch, UserAgent);
+        this.PlayerModerationApi = new PlayerModerationApi(objJson, fetch, UserAgent);
+        this.UsersApi = new UsersApi(objJson, fetch, UserAgent);
+        this.WorldsApi = new WorldsApi(objJson, fetch, UserAgent);
 
         return user; // success :)
     }

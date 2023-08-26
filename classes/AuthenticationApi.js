@@ -83,12 +83,8 @@ class AuthenticationApi {
         }
 
         if(authCookie.length > 0) {
-
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/user`, { headers: this.#GenerateHeaders(true, "", authCookie, twoFactorAuth) });
-            if(!res.ok) {
-                // do this so if invalid authcookie, if username and password credentials are passed it will move on to next statement to try those too.
-                if(!username && !password) return { success: false, status: res.status };
-            };
+            if(!res.ok && !username && !password) return { success: false, status: res.status }; // if request invalid and no username and pass creds are passed, return false otherwise try username and pass creds.
 
             if(res.ok) {
                 const json = await res.json();
@@ -100,22 +96,21 @@ class AuthenticationApi {
             }
         }
 
-        console.warn("Logging in with username and password (creating new session), consider saving session details and reusing them using the getAuthentication method.");
+        console.log("Logging in with username and password (creating new session), consider saving session details and re-using them using the getAuthentication method to avoid rate limiting.");
 
-        if(username.length  > 0 && password.length > 0) {
+        if(username && password) {
             const Headers = new this.#fetch.Headers({
-                "User-Agent": "node-vrchat-api/1.0.0a",
-                "authorization": `Basic ${username.length > 0 && password.length > 0 ? btoa(`${encodeURI(username)}:${encodeURI(password)}`) : ""}`
+                "User-Agent": this.#UserAgent,
+                "authorization": `Basic ${username && password ? btoa(`${encodeURI(username)}:${encodeURI(password)}`) : ""}`
             });
 
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/user`, { headers: Headers });
-            if(!await res.ok) return { success: false, status: res.status };
-
-            const json = await res.json();
+            if(!res.ok) return { success: false, status: res.status };
 
             const headers = await res.headers.get('set-cookie');
             const _authCookie = headers.substring(headers.indexOf("auth=") + 5, headers.substring(headers.indexOf("auth=") + 5).indexOf(";") + 5);
 
+            const json = await res.json();
             if(json.requiresTwoFactorAuth) {
                 return { success: false, authCookie: _authCookie, json: json };
             }
@@ -151,11 +146,10 @@ class AuthenticationApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/totp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": totp }) });
         if(!res.ok) return { success: false, error: res.status };
 
-        const json = await res.json();
-
         const responseHeaders = await res.headers.get('set-cookie');
         const twoFactorAuthCode = responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14, responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14).indexOf(";") + 14);
-
+        
+        const json = await res.json();
         return { success: json.verified, twoFactorAuth: twoFactorAuthCode };
     }
 
@@ -171,11 +165,10 @@ class AuthenticationApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/otp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": otp }) });
         if(!res.ok) return { success: false, error: res.status };
 
-        const json = await res.json();
-
         const responseHeaders = await res.headers.get('set-cookie');
         const twoFactorAuthCode = responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14, responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14).indexOf(";") + 14);
-
+        
+        const json = await res.json();
         return { success: json.verified, twoFactorAuth: twoFactorAuthCode };
     }
 
@@ -190,12 +183,11 @@ class AuthenticationApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/emailotp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ code: emailotp }) });
         if(!res.ok) return { success: false, error: res.status };
-
-        const json = await res.json();
-
+        
         const responseHeaders = await res.headers.get('set-cookie');
         const twoFactorAuthCode = responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14, responseHeaders.substring(responseHeaders.indexOf("twoFactorAuth=") + 14).indexOf(";") + 14);
-
+        
+        const json = await res.json();
         return { success: json.verified, twoFactorAuth: twoFactorAuthCode };
     }
 

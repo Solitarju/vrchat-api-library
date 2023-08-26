@@ -1,6 +1,6 @@
 {
   "name": "vrchat-api-library",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "🔥🔥 VRChat API library for ease-of-use interacting with VRChat's unofficial API and websocket events. ✅✅",
   "main": "index.js",
   "keywords": [
