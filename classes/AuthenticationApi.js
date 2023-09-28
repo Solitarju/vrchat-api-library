@@ -79,10 +79,10 @@ class AuthenticationApi {
      */
     async Login({username = "", password = "", authCookie = "", twoFactorAuth = ""} = {}) {
         if(!authCookie) {
-            if(!username && !password) throw Error("Missing argument(s) username and password or authCookie");
+            if(!username && !password) return { success: false, status: 401 };
         }
 
-        if(authCookie.length > 0) {
+        if(authCookie) {
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/user`, { headers: this.#GenerateHeaders(true, "", authCookie, twoFactorAuth) });
             if(!res.ok && !username && !password) return { success: false, status: res.status }; // if request invalid and no username and pass creds are passed, return false otherwise try username and pass creds.
 
@@ -126,7 +126,7 @@ class AuthenticationApi {
      * @returns {Promise<JSON>} Returns boolean indicating success and if successful user JSON object. { success: Boolean, json: JSON }
      */
     async GetCurrentUser() {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
+        if(!this.#authCookie) return { success: false, status: 401 };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { headers: this.#GenerateHeaders(true) });
         if(!res.ok) return { success: false, status: res.status };
@@ -141,7 +141,7 @@ class AuthenticationApi {
      * @returns {Promise<JSON>} Returns JSON with boolean value "verified" and string twoFactorAuth.
      */
     async verifyTotp(authCookie = "", totp = "") {
-        if(!authCookie.length > 0 || !totp.length > 0) return { success: false, status: 401 };
+        if(!authCookie || !totp) return { success: false, status: 401 };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/totp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": totp }) });
         if(!res.ok) return { success: false, error: res.status };
@@ -160,7 +160,7 @@ class AuthenticationApi {
      * @returns {Promise<JSON>} Returns JSON with boolean value "verified" and string twoFactorAuth.
      */
     async verifyOtp(authCookie = "", otp = "") {
-        if(!authCookie.length > 0 || !otp.length > 0) return { success: false, status: 401 };
+        if(!authCookie || !otp) return { success: false, status: 401 };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/otp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ "code": otp }) });
         if(!res.ok) return { success: false, error: res.status };
@@ -179,7 +179,7 @@ class AuthenticationApi {
      * @returns {Promise<JSON>} Returns JSON with boolean value "verified" and string twoFactorAuth.
      */
     async verifyEmailOtp(authCookie = "", emailotp = "") {
-        if(!authCookie.length > 0 || !emailotp.length > 0) return { success: false, status: 401 };
+        if(!authCookie || !emailotp) return { success: false, status: 401 };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/twofactorauth/emailotp/verify`, { method: "POST", headers: this.#GenerateHeaders(true, "application/json", authCookie), body: JSON.stringify({ code: emailotp }) });
         if(!res.ok) return { success: false, error: res.status };
@@ -198,8 +198,8 @@ class AuthenticationApi {
      * 
      * @returns {Promise<boolean>} Returns boolean indicating validity of token/cookie.
      */
-    async VerifyAuthToken(authCookie="") {
-        if(!authCookie.length > 0) return { success: true, ok: false };
+    async VerifyAuthToken(authCookie = "") {
+        if(!authCookie) return { success: true, ok: false };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth`, { headers: this.#GenerateHeaders(true, "", authCookie) });
         if(!res.ok) return { success: false, status: res.status };
@@ -216,7 +216,7 @@ class AuthenticationApi {
      * 
      * @returns {Promise<Boolean>} Returns boolean indicating whether function was successful.
      */
-    async Logout(authCookie) {
+    async Logout(authCookie = "") {
         if(!authCookie) return { success: false, status: 401 };
 
         const res = await this.#fetch(`${this.#APIEndpoint}/logout`, { method: "PUT", headers: this.#GenerateHeaders(true, "", authCookie), body: JSON.stringify({ "auth": authCookie }) });
@@ -232,7 +232,7 @@ class AuthenticationApi {
      * @returns {JSON} Returns JSON object of all credentials required for vrchat's api.
      */
     GetAuthentication() {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
+        if(!this.#authCookie) return { success: false, status: 401 };
 
         return { success: true, userid: this.#userid, authCookie: this.#authCookie, twoFactorAuth: this.#twoFactorAuth };
     }

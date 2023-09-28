@@ -1,26 +1,13 @@
+const Util = require('./Util.js');
+
 class SystemApi {
 
     #APIEndpoint = "https://api.vrchat.cloud/api/1";
 
+    #GenerateParameters;
+
     constructor() {
-
-    }
-
-    #GenerateParameters(params = {}) {
-        var paramString = "";
-        Object.keys(params).forEach((key) => {
-            var value = params[key];
-            if(!value) return;
-            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
-            
-            if(paramString) {
-                paramString += `&${key}=${value}`;
-                return;
-            }
-
-            paramString += `${key}=${value}`;
-        });
-        return paramString;
+        this.#GenerateParameters = Util.GenerateParameters;
     }
 
     /**

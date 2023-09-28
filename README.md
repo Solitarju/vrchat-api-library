@@ -1,7 +1,8 @@
 # VRChat API Library
 [Join the Discord server for support or any other inqueries!](https://discord.gg/cfdjj7TbaF)
 
-Easy VRChat integration to your Node.JS applications using [vrchat-api-library](https://www.npmjs.com/package/vrchat-api-library), also with realtime events using websockets!  
+Easy VRChat integration into your Node.js applications using [vrchat-api-library](https://www.npmjs.com/package/vrchat-api-library)!  
+With real-time events using websockets!
 
 Built according to the [**Unofficial VRChat API Docs**](https://vrchatapi.github.io/docs/api/).
 
@@ -195,15 +196,21 @@ console.log(vrchat.AuthenticationApi.GetAuthentication());
 - Class: **Enums**
 
 ## **TODO**
-- (Important) Optional argument fixes. (If a falsy value is passed, the function will omit that value and not specify it in the api request resulting in it returning to default instead).
 - Wiki/Documentation.
 - Code Consistency/General improvements.
 - User Class instead of raw JSON.
 - OSC (Potentially).
 
 ## **Changelog**
+- v1.2.4
+    - Added missing v1.2.3 changelog.
+    - Fixed any falsey arguments being completely ommitted. (See [issues#1](https://github.com/Solitarju/vrchat-api-library/issues/1))
+
+- v1.2.3
+    - I'm gonna be honest, I forgot to add the changelog last push and I don't remember what I did.
+
 - v1.2.2
-    - Singular markdown change
+    - Singular markdown change.
 
 - v1.2.1
     - Sorted each API section into their own modules for better orginization.

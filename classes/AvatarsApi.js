@@ -1,4 +1,5 @@
 const { Enums, QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
+const Util = require('./Util.js');
 
 class AvatarsApi {
 
@@ -11,9 +12,12 @@ class AvatarsApi {
     #twoFactorAuth = "";
     #debug = false;
 
+    #GenerateParameters;
+
     constructor({ userid = "", authCookie = "", twoFactorAuth = "", debug = false} = {}, fetch, UserAgent) {
         this.#fetch = fetch;
         this.#UserAgent = UserAgent;
+        this.#GenerateParameters = Util.GenerateParameters;
         if(!authCookie.length > 0) return this;
 
         this.#userid = userid;
@@ -35,32 +39,6 @@ class AvatarsApi {
 
         if(contentType) headers.set('Content-Type', contentType);
         return headers;
-    }
-
-    #GenerateParameters(params = {}) {
-        var paramString = "";
-        Object.keys(params).forEach((key) => {
-            var value = params[key];
-            if(!value) return;
-            if(value === QuerySort) return;
-            if(value === QueryOrder) return;
-            if(value === QueryReleaseStatus) return;
-
-            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
-            if(key === "user" && value === true) value = "me";
-            if(key === "sort" && value instanceof QuerySort) value = value.type;
-            if(key === "order" && value instanceof QueryOrder) value = value.type;
-            if(key === "releaseStatus" && value instanceof QueryReleaseStatus) value = value.type;
-            // ew this is yucky, but idk what else I can do here
-
-            if(paramString) {
-                paramString += `&${key}=${value}`;
-                return;
-            }
-
-            paramString += `${key}=${value}`;
-        });
-        return paramString;
     }
 
     /**
