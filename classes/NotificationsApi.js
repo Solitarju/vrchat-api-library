@@ -1,3 +1,5 @@
+const Util = require('./Util.js');
+
 class NotificationsApi {
 
     #fetch;
@@ -10,9 +12,12 @@ class NotificationsApi {
     #twoFactorAuth = "";
     #debug;
 
+    #GenerateParameters;
+
     constructor({ userid = "", authCookie = "", twoFactorAuth = "", debug = false} = {}, fetch, UserAgent) {
         this.#fetch = fetch;
         this.#UserAgent = UserAgent;
+        this.#GenerateParameters = Util.GenerateParameters;
         if(!authCookie.length > 0) return this;
 
         this.#userid = userid;
@@ -34,23 +39,6 @@ class NotificationsApi {
 
         if(contentType) headers.set('Content-Type', contentType);
         return headers;
-    }
-
-    #GenerateParameters(params = {}) {
-        var paramString = "";
-        Object.keys(params).forEach((key) => {
-            var value = params[key];
-            if(!value) return;
-            if(key === "n" && value === 60) return; // Omit n parameter if equal to 60 as it is the default value.
-            
-            if(paramString) {
-                paramString += `&${key}=${value}`;
-                return;
-            }
-
-            paramString += `${key}=${value}`;
-        });
-        return paramString;
     }
 
     /**

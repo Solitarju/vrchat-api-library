@@ -36,7 +36,7 @@ const { SystemApi } = require('./classes/SystemApi.js');
 const { UsersApi } = require('./classes/UsersApi.js');
 const { WorldsApi } = require('./classes/WorldsApi.js');
 
-const UserAgent = "node-vrchat-api/1.2.3 contact@solitarju.uk";
+const UserAgent = "node-vrchat-api/1.2.4 contact@solitarju.uk";
 
 class VRChat {
 
@@ -79,7 +79,7 @@ class VRChat {
      * @returns {Promise<JSON>} Returns JSON object with authentication details and user object.
      */
     async Authenticate({username = "", password = "", authCookie = "", twoFactorAuth = ""} = {}, twoFactorCallback) {
-        if((!username.length > 0 || !password.length > 0) && (!authCookie.length > 0)) return false;
+        if((!username || !password) && (!authCookie)) return false;
 
         const user = await this.AuthenticationApi.Login({ username: username, password: password, authCookie: authCookie, twoFactorAuth: twoFactorAuth });
 
@@ -90,7 +90,7 @@ class VRChat {
             const code = await twoFactorCallback(user.json["requiresTwoFactorAuth"]);
 
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'emailotp') {
-                if(!code || !code.length > 0) return user;
+                if(!code) return user;
 
                 const twoFactor = await this.AuthenticationApi.verifyEmailOtp(user.authCookie, code);
                 this.#Debug(twoFactor);
@@ -105,7 +105,7 @@ class VRChat {
             }
 
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'totp') {
-                if(!code || !code.length > 0) return user;
+                if(!code) return user;
 
                 const twoFactor = await this.AuthenticationApi.verifyTotp(user.authCookie, code);
                 if(!twoFactor.success) return user;
@@ -118,7 +118,7 @@ class VRChat {
             }
 
             if(user.json.requiresTwoFactorAuth[0].toLowerCase() === 'otp') {
-                if(!code || !code.length > 0) return user;
+                if(!code) return user;
 
                 const twoFactor = await this.AuthenticationApi.verifyOtp(user.authCookie, code);
                 if(!twoFactor.success) return user;
