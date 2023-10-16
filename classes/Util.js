@@ -1,3 +1,5 @@
+const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
+
 class Util {
 
     static GenerateParameters = (params = {}) => {
