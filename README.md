@@ -4,10 +4,11 @@ VRChat API Library is a Node.js library that allows easy integration of the VRCh
 It provides real-time event handling through WebSockets, all endpoints and API sections are built according to the **unofficial** [VRChat API Docs](https://vrchatapi.github.io/docs/api/).
 
 Feel free to reach out on the Discord server below for support or inquiries.  
-
-<img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
-<img alt="NPM" src="https://img.shields.io/npm/l/vrchat-api-library?logo=npm&label=npm&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fvrchat-api-library">
-<img alt="Discord" src="https://img.shields.io/discord/1163384360314081342?logo=discord&label=Discord&color=0%2C%200%2C%20255&link=https%3A%2F%2Fdiscord.gg%2FER3Z7NBzvv">
+<div align="center">
+  <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
+  <img alt="NPM" src="https://img.shields.io/npm/l/vrchat-api-library?logo=npm&label=npm&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fvrchat-api-library">
+  <img alt="Discord" src="https://img.shields.io/discord/1163384360314081342?logo=discord&label=Discord&color=0%2C%200%2C%20255&link=https%3A%2F%2Fdiscord.gg%2FER3Z7NBzvv">
+</div>
 
 ## Table of Contents
 
