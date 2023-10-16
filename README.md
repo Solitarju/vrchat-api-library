@@ -5,9 +5,15 @@ It provides real-time event handling through WebSockets, all endpoints and API s
 
 Feel free to reach out on the Discord server below for support or inquiries.  
 <div align="center">
-  <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
-  <img alt="NPM" src="https://img.shields.io/npm/l/vrchat-api-library?logo=npm&label=npm&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fvrchat-api-library">
+  <a style="text-decoration: none;" href="https://github.com/Solitarju/vrchat-api-library">
+    <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
+  </a>
+  <a style="text-decoration: none;" href="https://www.npmjs.com/package/vrchat-api-library">
+    <img alt="NPM" src="https://img.shields.io/npm/l/vrchat-api-library?logo=npm&label=npm&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fvrchat-api-library">
+  </a>
+  <a style="text-decoration: none;" href="https://discord.gg/ER3Z7NBzvv">
   <img alt="Discord" src="https://img.shields.io/discord/1163384360314081342?logo=discord&label=Discord&color=0%2C%200%2C%20255&link=https%3A%2F%2Fdiscord.gg%2FER3Z7NBzvv">
+  </a>
 </div>
 
 ## Table of Contents
