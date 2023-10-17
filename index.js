@@ -18,25 +18,25 @@
 
 const fetch = require('node-fetch');
 
-const { Enums } = require('./classes/Enums.js');
-const { EventsApi } = require('./classes/EventsApi.js');
-const { AuthenticationApi } = require('./classes/AuthenticationApi.js');
-const { AvatarsApi } = require('./classes/AvatarsApi.js');
-const { EconomyApi } = require('./classes/EconomyApi.js');
-const { FavoritesApi } = require('./classes/FavouritesApi.js');
-const { FilesApi } = require('./classes/FilesApi.js');
-const { FriendsApi } = require('./classes/FriendsApi.js');
-const { GroupsApi } = require('./classes/GroupsApi.js');
-const { InviteApi } = require('./classes/InviteApi.js');
-const { InstancesApi } = require('./classes/InstancesApi.js');
-const { NotificationsApi } = require('./classes/NotificationsApi.js');
-const { PermissionsApi } = require('./classes/PermissionsApi.js');
-const { PlayerModerationApi } = require('./classes/PlayerModerationApi.js');
-const { SystemApi } = require('./classes/SystemApi.js');
-const { UsersApi } = require('./classes/UsersApi.js');
-const { WorldsApi } = require('./classes/WorldsApi.js');
+const { Enums } = require('./classes/APIs/Enums.js');
+const { EventsApi } = require('./classes/APIs/EventsApi.js');
+const { AuthenticationApi } = require('./classes/APIs/AuthenticationApi.js');
+const { AvatarsApi } = require('./classes/APIs/AvatarsApi.js');
+const { EconomyApi } = require('./classes/APIs/EconomyApi.js');
+const { FavoritesApi } = require('./classes/APIs/FavouritesApi.js');
+const { FilesApi } = require('./classes/APIs/FilesApi.js');
+const { FriendsApi } = require('./classes/APIs/FriendsApi.js');
+const { GroupsApi } = require('./classes/APIs/GroupsApi.js');
+const { InviteApi } = require('./classes/APIs/InviteApi.js');
+const { InstancesApi } = require('./classes/APIs/InstancesApi.js');
+const { NotificationsApi } = require('./classes/APIs/NotificationsApi.js');
+const { PermissionsApi } = require('./classes/APIs/PermissionsApi.js');
+const { PlayerModerationApi } = require('./classes/APIs/PlayerModerationApi.js');
+const { SystemApi } = require('./classes/APIs/SystemApi.js');
+const { UsersApi } = require('./classes/APIs/UsersApi.js');
+const { WorldsApi } = require('./classes/APIs/WorldsApi.js');
 
-const UserAgent = "node-vrchat-api/1.2.4 contact@solitarju.uk";
+const UserAgent = `vrchat-api-library/${require('./package.json').version} admin@solitarju.uk`;
 
 class VRChat {
 

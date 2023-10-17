@@ -1,3 +1,6 @@
+const { User } = require('../UserClass.js');
+const { Error } = require('../ErrorClass.js');
+
 class UsersApi {
 
     #fetch;
@@ -56,16 +59,17 @@ class UsersApi {
      * 
      * Gets user object from userid.
      * 
-     * @returns {Promise<JSON>} Returns JSON object of current user.
+     * @returns {User} Returns JSON object of current user.
      */
     async GetUserById(userid = "") {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
-        if(!userid.length > 0) throw Error("Missing argument userid.");
+        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials. Please make sure you are authenticated either through the VRChat helper class or manually for this object. If you authenticated, your credentials might have expired/invalidated.", 401, {});
+        if(!userid.length > 0) return new Error("Missing userid argument.", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, json: await res.json() };
+        return new User(json);
     }
 
     /**

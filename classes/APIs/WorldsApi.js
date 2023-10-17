@@ -1,5 +1,5 @@
 const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
-const Util = require('./Util.js');
+const Util = require('../Util.js');
 
 class WorldsApi {
 

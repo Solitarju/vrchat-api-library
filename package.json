@@ -1,6 +1,6 @@
 {
   "name": "vrchat-api-library",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "🔥🔥 Your All-in-One Node.js API Solution for Seamless Interaction with VRChat's REST API and real-time events using Websockets! ✅✅",
   "main": "index.js",
   "keywords": [

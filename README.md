@@ -1,12 +1,12 @@
 # VRChat API Library
 
-VRChat API Library is a Node.js library that allows easy integration of the VRChat API into your applications.  
-It provides real-time event handling through WebSockets, all endpoints and API sections are built according to the **unofficial** [VRChat API Docs](https://vrchatapi.github.io/docs/api/).
+VRChat API Library is a Node.js library that allows easy integration of the VRChat API into your applications. It provides real-time event handling through WebSockets, all endpoints and API sections are built according to the **unofficial** [VRChat API Docs](https://vrchatapi.github.io/docs/api/).
 
 Feel free to reach out on the Discord server below for support or inquiries.  
+
 <div align="center">
   <a style="text-decoration: none;" href="https://github.com/Solitarju/vrchat-api-library">
-    <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
+    <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=GitHub&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
   </a>
   <a style="text-decoration: none;" href="https://www.npmjs.com/package/vrchat-api-library">
     <img alt="NPM" src="https://img.shields.io/npm/l/vrchat-api-library?logo=npm&label=npm&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fvrchat-api-library">
@@ -37,6 +37,7 @@ Use of the VRChat API using applications other than the approved methods (websit
 ## Introduction
 
 VRChat API Library is a Node.js module that streamlines integration with the VRChat platform.  
+
 It allows you to interact with VRChat's APIs, enabling features such as setting & retrieving user information and real-time events with custom coded QOL improvements such as duplicate event prevention and user-online / user-offline custom events.  
 
 Each API section and endpoints are mostly built in reference to the [**Unofficial VRChat API Docs**](https://vrchatapi.github.io/docs/api/) with exception to the real-time EventsApi.
@@ -209,6 +210,10 @@ All APIs can also be found at the community-driven unofficial [VRChat API Docs](
 ## **Changelog**  
 
 All dates in this document are formatted as DD-MM-YYYY.
+
+- v1.2.6 (17/10/2023)
+  - Started refactoring API response handling. (Created User class and Error class)
+  - Updated User Agent parameters & contact information and made version update automatically with package.json as it's impractical to manually change the hard code each time.
 
 - v1.2.5 (16/10/2023)
   - Fixed missing Enums import for GenerateParamater function in Util class.

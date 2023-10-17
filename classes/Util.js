@@ -1,4 +1,4 @@
-const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
+const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./APIs/Enums.js');
 
 class Util {
 

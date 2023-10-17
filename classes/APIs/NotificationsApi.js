@@ -1,4 +1,4 @@
-const Util = require('./Util.js');
+const Util = require('../Util.js');
 
 class NotificationsApi {
 
