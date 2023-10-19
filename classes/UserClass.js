@@ -33,12 +33,13 @@ class User {
     userIcon = "";
     worldId = "wrld_ba913a96-fac4-4048-a062-9aa5db092812";
 
-    constructor(userObject = {}) {
-        if(!Object.keys(userObject).length > 0) return this;
-        Object.keys(userObject).forEach(element => {
-            this[element] = userObject[element];
+    constructor(res = {}) {
+        if(!Object.keys(res).length > 0) return this;
+        Object.keys(res).forEach(element => {
+            this[element] = res[element];
         });
-    }
-}
+    };
+    
+};
 
 module.exports = { User };

@@ -1,4 +1,5 @@
 const { User } = require('../UserClass.js');
+const { CurrentUser } = require('../CurrentUser.js');
 const { Error } = require('../ErrorClass.js');
 
 class UsersApi {
@@ -62,7 +63,7 @@ class UsersApi {
      * @returns {User} Returns JSON object of current user.
      */
     async GetUserById(userid = "") {
-        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials. Please make sure you are authenticated either through the VRChat helper class or manually for this object. If you authenticated, your credentials might have expired/invalidated.", 401, {});
+        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
         if(!userid.length > 0) return new Error("Missing userid argument.", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
@@ -79,8 +80,8 @@ class UsersApi {
      * @returns {Promise<JSON>} Returns updated user JSON object.
      */
     async UpdateUserInfo({email = "", birthday = "", tags = [], status = "", statusDescription = "", bio = "", bioLinks = []} = {}) {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
-        if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) throw Error("Missing argument userInfo JSON.");
+        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
+        if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) new Error("Missing argument(s)", 400, {});
 
         tags.length > 0 ? tags : tags = false;
         bioLinks.length > 0 ? bioLinks : bioLinks = false;
@@ -92,9 +93,10 @@ class UsersApi {
         }
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { method: "PUT", headers: this.#GenerateHeaders(true, "application/json"), body: JSON.stringify(userInfoJSON) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, user: await res.json() };
+        return new CurrentUser(json);
     }
 
     /**

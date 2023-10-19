@@ -211,8 +211,8 @@ All APIs can also be found at the community-driven unofficial [VRChat API Docs](
 
 All dates in this document are formatted as DD-MM-YYYY.
 
-- v1.2.6 (17/10/2023)
-  - Started refactoring API response handling. (Created User class and Error class)
+- v1.2.6 (19/10/2023)
+  - Started refactoring API response handling. (Creating classes and patching the API classes & their functions accordingly, but I'm working slow)
   - Updated User Agent parameters & contact information and made version update automatically with package.json as it's impractical to manually change the hard code each time.
 
 - v1.2.5 (16/10/2023)
