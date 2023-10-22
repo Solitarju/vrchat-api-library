@@ -1,6 +1,8 @@
-const { User } = require('../UserClass.js');
+const { User } = require('../User.js');
 const { CurrentUser } = require('../CurrentUser.js');
-const { Error } = require('../ErrorClass.js');
+const { LimitedUser } = require('../LimitedUser.js');
+const { Group } = require('../Group.js');
+const { Error } = require('../Error.js');
 
 class UsersApi {
 
@@ -44,27 +46,34 @@ class UsersApi {
      * 
      * Searches for users by displayname.
      * 
-     * @returns {Promise<JSON>} Queries for users and returns user object.
+     * @returns {Promise<LimitedUser>} Queries for users and returns an array of LimitedUser objects.
      */
     async SearchAllUsers({ displayName = "", returnAmount = 1, offset = 0 } = {}) {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
-        if(!displayName.length > 0) throw Error("Missing argument displayName.");
+        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
+        if(!displayName.length > 0) return new Error("Missing argument(s).", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users?search=${displayName}${returnAmount > 0 && returnAmount < 100 ? "&n=" + returnAmount : ""}${offset > 0 ? "&offset" + offset : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, json: await res.json() };
+        var arrLength = json.length;
+        var objectArray = [];
+        for(let i = 0; i < arrLength; i++) {
+            objectArray.push(new LimitedUser(json[i]));
+        };
+
+        return objectArray;
     }
 
     /**
      * 
      * Gets user object from userid.
      * 
-     * @returns {User} Returns JSON object of current user.
+     * @returns {Promise<User>} Returns User object.
      */
     async GetUserById(userid = "") {
         if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
-        if(!userid.length > 0) return new Error("Missing userid argument.", 400, {});
+        if(!userid.length > 0) return new Error("Missing argument(s).", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -77,11 +86,11 @@ class UsersApi {
      * 
      * Updates current user information such as bio and status etc.
      * 
-     * @returns {Promise<JSON>} Returns updated user JSON object.
+     * @returns {Promise<JSON>} Returns updated CurrentUser object.
      */
     async UpdateUserInfo({email = "", birthday = "", tags = [], status = "", statusDescription = "", bio = "", bioLinks = []} = {}) {
         if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
-        if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) new Error("Missing argument(s)", 400, {});
+        if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) return new Error("Missing argument(s)", 400, {});
 
         tags.length > 0 ? tags : tags = false;
         bioLinks.length > 0 ? bioLinks : bioLinks = false;
@@ -103,30 +112,40 @@ class UsersApi {
      * 
      * Gets current users groups.
      * 
-     * @returns {Promise<JSON>} Returns JSON array of current users groups.
+     * @returns {Promise<Group>} Returns an array of users Group objects.
      */
     async GetUserGroups() {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
+        if(!this.#authCookie.length > 0) return new Error('Invalid Credentials.', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, groups: await res.json() };
+        var GroupArray = [];
+        for(let i = 0; i < json.length; i++) {
+            GroupArray.push(new Group(json[i]));
+        }
+        return GroupArray;
     }
 
     /**
      * 
      * Gets current user group requests.
      * 
-     * @returns {Promise<JSON>} Returns JSON array of current users group requests.
+     * @returns {Promise<Group>} Returns an array of users group requests.
      */
     async GetUserGroupRequests() {
-        if(!this.#authCookie.length > 0) return { success: false, status: 401 };
+        if(!this.#authCookie.length > 0) return new Error('Invalid Credentials.', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups/requested`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, groups: await res.json() };
+        var GroupArray = [];
+        for(let i = 0; i < json.length; i++) {
+            GroupArray.push(new Group(json[i]));
+        }
+        return GroupArray;
     }
 
 }
