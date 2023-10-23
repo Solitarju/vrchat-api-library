@@ -2,6 +2,8 @@ const Util = require('../Util.js');
 const { Error } = require('../Error.js');
 const { LimitedUser } = require('../LimitedUser.js');
 const { Notification } = require('../Notification.js');
+const { Success } = require('../Success.js');
+const { FriendStatus } = require('../FriendStatus.js');
 
 class FriendsApi {
 
@@ -47,7 +49,7 @@ class FriendsApi {
      * 
      * List information about friends.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LimitedUser>}
      */
     async ListFriends({ offset = 0, n = 60, offline = false } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -68,7 +70,7 @@ class FriendsApi {
      * 
      * Send a friend request to another user.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Notification>}
      */
     async SendFriendRequest(userId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
@@ -88,13 +90,14 @@ class FriendsApi {
      * @returns {Promise<JSON>}
      */
     async DeleteFriendRequest(userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!userId) return new Error("Missing Argument(s)", 400, {});
         
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendRequest`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Success(json);
     }
 
     /**
@@ -104,13 +107,14 @@ class FriendsApi {
      * @returns {Promise<JSON>}
      */
     async CheckFriendStatus(userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!userId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendStatus`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new FriendStatus(json);
     }
 
     /**
@@ -120,13 +124,14 @@ class FriendsApi {
      * @returns {Promise<JSON>}
      */
     async Unfriend(userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!userId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/friends/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Success(json);
     }
 }
 
