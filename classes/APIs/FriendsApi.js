@@ -1,4 +1,7 @@
 const Util = require('../Util.js');
+const { Error } = require('../Error.js');
+const { LimitedUser } = require('../LimitedUser.js');
+const { Notification } = require('../Notification.js');
 
 class FriendsApi {
 
@@ -47,13 +50,18 @@ class FriendsApi {
      * @returns {Promise<JSON>}
      */
     async ListFriends({ offset = 0, n = 60, offline = false } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ offset, n, offline });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/friends${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedUser(json[i]));
+        }
+        return returnArray;
     }
 
     /**
@@ -63,13 +71,14 @@ class FriendsApi {
      * @returns {Promise<JSON>}
      */
     async SendFriendRequest(userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!userId) return new Error("Missing Argument(s)", 400, {});
         
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendRequest`, { method: 'POST', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Notification(json);
     }
 
     /**

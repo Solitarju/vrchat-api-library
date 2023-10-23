@@ -152,7 +152,7 @@ class VRChat {
         this.UsersApi = new UsersApi(objJson, fetch, UserAgent);
         this.WorldsApi = new WorldsApi(objJson, fetch, UserAgent);
 
-        return user; // success :)
+        return user;
     }
 
     /**
@@ -186,6 +186,6 @@ class VRChat {
 
         return { success: true };
     }
-};
+}
 
 module.exports = { VRChat, EventsApi, AuthenticationApi, AvatarsApi, EconomyApi, FavoritesApi, FilesApi, FriendsApi, GroupsApi, InviteApi, InstancesApi, NotificationsApi, PermissionsApi, PlayerModerationApi, SystemApi, UsersApi, WorldsApi, Enums };
