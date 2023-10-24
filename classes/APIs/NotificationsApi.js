@@ -1,4 +1,7 @@
 const Util = require('../Util.js');
+const { Notification } = require('../Notification.js');
+const { Success } = require('../Success.js');
+const { Error } = require('../Error.js');
 
 class NotificationsApi {
 
@@ -45,32 +48,38 @@ class NotificationsApi {
      * 
      * Retrieve all of the current user's notifications.
      *  
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Notification>}
      */
     async ListNotifications({ hidden = false, after = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
 
         const params = this.#GenerateParameters({ hidden, after, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Notification(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Accept a friend request by notification frq_ ID. Friend requests can be found using the NotificationsAPI getNotifications by filtering of type friendRequest.
      *  
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>}
      */
     async AcceptFriendRequest(notificationId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!notificationId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/accept`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Success(json);
     }
 
     /**
@@ -80,13 +89,14 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async MarkNotificationAsRead(notificationId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!notificationId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/see`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Notification(json);
     }
 
     /**
@@ -96,13 +106,14 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async DeleteNotification(notificationId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!notificationId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/hide`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Notification(json);
     }
 
     /**
@@ -112,12 +123,13 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async ClearAllNotifications() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/clear`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Success(json);
     }
 
 }
