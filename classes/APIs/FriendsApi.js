@@ -87,7 +87,7 @@ class FriendsApi {
      * 
      * Deletes an outgoing friend request to another user. To delete an incoming friend request, use the deleteNotification method instead.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>}
      */
     async DeleteFriendRequest(userId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
@@ -104,7 +104,7 @@ class FriendsApi {
      * 
      * Retrieve if the user is currently a friend with a given user, if they have an outgoing friend request, and if they have an incoming friend request. The proper way to receive and accept friend request is by checking if the user has an incoming Notification of type friendRequest, and then accepting that notification.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FriendStatus>}
      */
     async CheckFriendStatus(userId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
@@ -119,9 +119,9 @@ class FriendsApi {
 
     /**
      * 
-     * Unfriend a user by ID. :'(
+     * Unfriend a user by ID. oh no :(
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>}
      */
     async Unfriend(userId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});

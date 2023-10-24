@@ -1,5 +1,8 @@
-const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
 const Util = require('../Util.js');
+const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
+const { World } = require('../World.js');
+const { LimitedWorld } = require('../LimitedWorld.js');
+const { Error } = require('../Error.js');
 
 class WorldsApi {
 
@@ -45,80 +48,101 @@ class WorldsApi {
      * 
      * Search and list any worlds by query filters.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LimitedWorld>}
      */
     async SearchAllWorlds({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedWorld(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Create a new world. This endpoint requires assetUrl to be a valid File object with .vrcw file extension, and imageUrl to be a valid File object with an image file extension.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<World>}
      */
     async CreateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!assetUrl || !imageUrl || !name) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!assetUrl || !imageUrl || !name) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new World(json);
     }
     
     /**
      * 
      * Search and list currently active worlds by query filters.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LimitedWorld>}
     */
     async ListActiveWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/active${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-    
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedWorld(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Search and list favorited worlds by query filters.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LimitedWorld>}
      */
     async ListFavoritedWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedWorld(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Search and list recently visited worlds by query filters.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LimitedWorld}
      */
     async ListRecentWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/recent${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedWorld(json[i]));
+        }
+        return returnArray;
     }
 
     /**
