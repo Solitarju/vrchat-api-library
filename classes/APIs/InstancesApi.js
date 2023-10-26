@@ -1,3 +1,7 @@
+const { Instance } = require('../Instance.js');
+const { Success } = require('../Success.js');
+const { Error } = require('../Error.js');
+
 class InstancesApi {
 
     #fetch;
@@ -45,13 +49,14 @@ class InstancesApi {
      * @returns {Promise<JSON>} 
      */
     async GetInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message, res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Instance(json);
     }
 
     /**
@@ -77,13 +82,14 @@ class InstancesApi {
      * @returns {Promise<JSON>} 
      */
     async SendSelfInvite(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message, res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Success(json);
     }
 
     /**
@@ -93,13 +99,14 @@ class InstancesApi {
      * @returns {Promise<JSON>} 
      */
     async GetInstanceByShortName(shortName = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!shortName) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!shortName) return new Error("Missing Argument(s)", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message, res.status, res);
 
-        return { success: true, res: await res.json() };
+        return new Instance(json);
     }
 
 }
