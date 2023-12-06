@@ -110,7 +110,7 @@ const asyncMethod = async () => {
     vrchat.EventsApi.Connect();
 
     // Usage of custom undocumented event type, this isn't valid, just for demonstration purposes.
-    // Upon getting a Undocumented event type, the library will warn you and ask to report it. (Please do this!!)
+    // Upon getting an undocumented event type, the library will warn you and ask to report it. (Please do this!!)
     vrchat.EventsApi.on("undocumented event", (data) => {
         console.log("Undocumented Event");
         console.log(data);
