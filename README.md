@@ -1,6 +1,8 @@
 # VRChat API Library
 
-VRChat API Library is a Node.js library that allows easy integration of the VRChat API into your applications. It provides real-time event handling through WebSockets, all endpoints and API sections are built according to the **unofficial** [VRChat API Docs](https://vrchatapi.github.io/docs/api/).
+VRChat API Library is a Node.js library that allows easy integration of the VRChat API into your applications.  
+
+It provides real-time event handling through WebSockets, all endpoints and API sections are built according to the **community driven** [VRChat API Docs](https://vrchatapi.github.io/docs/api/).
 
 Feel free to reach out on the Discord server below for support or inquiries.  
 
@@ -27,6 +29,7 @@ Feel free to reach out on the Discord server below for support or inquiries.
 
 ## Disclaimer
 
+**Official Disclaimer from VRChat:**  
 Use of the VRChat API using applications other than the approved methods (website, VRChat application) is not officially supported. When using the API, please adhere to the following guidelines:
 
 - We do not provide documentation or support for the API.
@@ -38,14 +41,19 @@ Use of the VRChat API using applications other than the approved methods (websit
 
 VRChat API Library is a Node.js module that streamlines integration with the VRChat platform.  
 
-It allows you to interact with VRChat's APIs, enabling features such as setting & retrieving user information and real-time events with custom coded QOL improvements such as duplicate event prevention and user-online / user-offline custom events.  
+It allows you to interact with VRChat's APIs, enabling essential features and offering QOL utilities & improvements, such as:  
 
-Each API section and endpoints are mostly built in reference to the [**Unofficial VRChat API Docs**](https://vrchatapi.github.io/docs/api/) with exception to the real-time EventsApi.
+1. Setting & retrieving user information.
+2. Real-time events.
+3. Custom implemented user-online / user-offline events.  
+4. QOL duplicate event prevention.
+
+Each API section and endpoints are mostly built in reference to the **community-driven** [**VRChat API Docs**](https://vrchatapi.github.io/docs/api/), with exception to the real-time EventsApi.
 
 ## Installation
 
-Install the library via NPM:  
-Before installation, ensure you have **Node.js** installed.
+Install the library via **NPM**:  
+Before installation, ensure you have **Node.JS** installed.
 
 ```shell
 npm install vrchat-api-library
@@ -69,7 +77,8 @@ const readline = require('readline');
 
 const vrchat = new VRChat();
 
-// Promise based console input function. Any promise based input will work, as long as it returns the OTP code.
+// Promise based console input function.
+// Any promise-based input will work assuming it returns the two-factor authentication code.
 function Prompt(query) {
     const question = readline.createInterface({
         input: stdin,
@@ -97,6 +106,7 @@ const asyncMethod = async () => {
 
     console.log(await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }));
 
+    // Basic EventsApi usage, making use of the VRChat class.
     vrchat.EventsApi.Connect();
 
     vrchat.EventsApi.on(Enums.EventType.error, (err) => {
@@ -113,7 +123,7 @@ const asyncMethod = async () => {
         console.log(data);
     });
 
-    vrchat.EventsApi.Disconnect();
+    // vrchat.EventsApi.Disconnect(); -- Optionally disconnect from the API
 }
 
 asyncMethod();
@@ -122,7 +132,7 @@ asyncMethod();
 ## **Classes/API Coverage**
 
 Here's a comprehensive overview of the classes and APIs available in the library:  
-All APIs can also be found at the community-driven unofficial [VRChat API Docs](https://vrchatapi.github.io/docs/api/) with exception to the EventsApi.
+All APIs can also be found at the **community-driven** [VRChat API Docs](https://vrchatapi.github.io/docs/api/), with exception to the EventsApi.
 
 ### **VRChat**
 

@@ -1,3 +1,6 @@
+const { UserExists } = require('../UserExists.js');
+const { Error } = require('../Error.js');
+
 class AuthenticationApi {
 
     #fetch;
@@ -39,35 +42,35 @@ class AuthenticationApi {
      * 
      * Checks if a user exists on vrchat by using email, username or displayname (prioritizes that order).
      * 
-     * @returns {Promise<Boolean>} Boolean value inidicating whether user exists.
+     * @returns {Promise<UserExists>} UserExists Object inidicating whether user exists.
      */
     async UserExists({ email = "", username = "", displayName = "", excludeUserId = ""} = {}) {
-        if(!email.length > 0 && !displayName.length > 0 && !username.length > 0) throw Error('Missing argument(s) email, displayName or userId');
+        if(!email.length > 0 && !displayName.length > 0 && !username.length > 0) return new Error("Missing argument(s): email, displayName or userId", 401, {});
 
         const exclusion = excludeUserId.length > 0 ? `&excludeUserId=${excludeUserId}` : "";
 
         if(email.length > 0) {
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/exists?email=${email}${exclusion}`, { headers: this.#GenerateHeaders() });
-            if(!res.ok) return { success: false, status: res.status };
-
             const json = await res.json();
-            return { success: true, userExists: json.userExists };
+            
+            if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+            return new UserExists(json);
         }
 
         if(username.length > 0) {
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/exists?username=${username}${exclusion}`, { headers: this.#GenerateHeaders() });
-            if(!res.ok) return { success: false, status: res.status };
-
             const json = await res.json();
-            return { success: true, userExists: json.userExists };
+            
+            if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+            return new UserExists(json);
         }
 
         if(displayName.length > 0) {
             const res = await this.#fetch(`${this.#APIEndpoint}/auth/exists?displayName=${displayName}${exclusion}`, { headers: this.#GenerateHeaders() });
-            if(!res.ok) return { success: false, status: res.status }; 
-            
             const json = await res.json();
-            return { success: true, userExists: json.userExists };
+            
+            if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+            return new UserExists(json);
         }
     }
 
