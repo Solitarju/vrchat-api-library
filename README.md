@@ -29,7 +29,7 @@ Feel free to reach out on the Discord server below for support or inquiries.
 
 ## Disclaimer
 
-**Official Disclaimer from VRChat:**  
+**Official Disclaimer from VRChat (Tupper):**  
 Use of the VRChat API using applications other than the approved methods (website, VRChat application) is not officially supported. When using the API, please adhere to the following guidelines:
 
 - We do not provide documentation or support for the API.
@@ -140,11 +140,12 @@ All APIs can also be found at the **community-driven** [VRChat API Docs](https:/
 
 ### **EventsApi**
 
-- **Description**: The EventsApi class offers a highly stable WebSocket connection for real-time events related to users and friends. It has been tested for extended periods, including 48+ hours straight.
+- **Description**: The EventsApi class offers a highly stable WebSocket connection for real-time events related to users and friends.
 
 - **Features**:
   - Custom "user-online" and "user-offline" events to monitor user presence.
-  - While my findings go undocumented and the community API documentation completely omits WebSockets, the EventsApi remains fully functional. You can pass any currently known and documented event types from the Enums class, or manually as strings if you're familiar with them. It's designed to be stable and modular.
+  - Event type modularity, allowing undocumented event types to work flawlessly.
+  - Smart event de-duplication, making sure events don't repeat/spam while letting authentic & valid events pass.
 
 ### **AuthenticationApi**
 
