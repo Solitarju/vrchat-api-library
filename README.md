@@ -53,7 +53,7 @@ Each API section and endpoints are mostly built in reference to the **community-
 ## Installation
 
 Install the library via **NPM**:  
-Before installation, ensure you have **Node.JS** installed.
+Before installation, ensure you have **Node.js** installed.
 
 ```shell
 npm install vrchat-api-library
@@ -108,6 +108,13 @@ const asyncMethod = async () => {
 
     // Basic EventsApi usage, making use of the VRChat class.
     vrchat.EventsApi.Connect();
+
+    // Usage of custom undocumented event type, this isn't valid, just for demonstration purposes.
+    // Upon getting a Undocumented event type, the library will warn you and ask to report it. (Please do this!!)
+    vrchat.EventsApi.on("undocumented event", (data) => {
+        console.log("Undocumented Event");
+        console.log(data);
+    });
 
     vrchat.EventsApi.on(Enums.EventType.error, (err) => {
         console.log("Error: " + err.message);
@@ -222,9 +229,10 @@ All APIs can also be found at the **community-driven** [VRChat API Docs](https:/
 
 All dates in this document are formatted as DD-MM-YYYY.
 
-- v1.2.6 (22/10/2023)
+- v1.2.6 (06/12/2023)
   - Started refactoring API response handling. (Creating classes and patching the API responses, UsersApi complete so far with one minor thing to work out)
-  - Updated User Agent parameters & contact information and made version update automatically with package.json as it's impractical to manually change the hard code each time.
+  - Updated User Agent parameters & contact information and made version update automatically with package.json, as it's impractical to manually change the hard code each time.
+  - Slight README improvements.
 
 - v1.2.5 (16/10/2023)
   - Fixed missing Enums import for GenerateParamater function in Util class.
