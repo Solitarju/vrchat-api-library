@@ -1,5 +1,6 @@
 const { UserExists } = require('../UserExists.js');
 const { Error } = require('../Error.js');
+const { CurrentUser } = require('../CurrentUser.js');
 
 class AuthenticationApi {
 
@@ -114,9 +115,7 @@ class AuthenticationApi {
             const _authCookie = headers.substring(headers.indexOf("auth=") + 5, headers.substring(headers.indexOf("auth=") + 5).indexOf(";") + 5);
 
             const json = await res.json();
-            if(json.requiresTwoFactorAuth) {
-                return { success: false, authCookie: _authCookie, json: json };
-            }
+            if(json.requiresTwoFactorAuth) return { success: false, authCookie: _authCookie, json: json };
 
             return { success: true, authCookie: _authCookie, json: json };
         }
@@ -124,17 +123,18 @@ class AuthenticationApi {
 
     /**
      * 
-     * Returns JSON userObject of the user currently authenticated.
+     * Retrieves the current user object.
      * 
-     * @returns {Promise<JSON>} Returns boolean indicating success and if successful user JSON object. { success: Boolean, json: JSON }
+     * @returns {Promise<CurrentUser>} Returns CurrentUser object if successful.
      */
     async GetCurrentUser() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, json: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new CurrentUser(json);
     }
 
     /**
