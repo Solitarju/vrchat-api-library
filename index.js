@@ -93,8 +93,6 @@ class VRChat {
                 if(!code) return user;
 
                 const twoFactor = await this.AuthenticationApi.verifyEmailOtp(user.authCookie, code);
-                this.#Debug(twoFactor);
-
                 if(!twoFactor.success) return user;
 
                 const auth = await this.Authenticate({
