@@ -1,6 +1,6 @@
 class FriendStatus {
 
-    isFriend = true;
+    isFriend = false;
     outgoingRequest = false;
     incomingRequest = false;
 

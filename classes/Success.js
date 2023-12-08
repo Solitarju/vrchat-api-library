@@ -1,8 +1,8 @@
 class Success {
 
     success = {
-        "message": "Friendship request deleted",
-        "status_code": 200
+        "message": "",
+        "status_code": 418
     }
 
     constructor(res = {}) {
