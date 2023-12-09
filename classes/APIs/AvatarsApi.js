@@ -54,8 +54,8 @@ class AvatarsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/avatar`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Avatar(json);
     }
 
@@ -66,12 +66,13 @@ class AvatarsApi {
      * @returns {Promise<JSON>}
      */
     async SearchAvatars({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return { success: true, res: await res.json() };
     }
 

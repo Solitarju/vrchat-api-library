@@ -1,6 +1,6 @@
 class Error {
 
-    ErrorMessage = "";
+    Message = "";
     HTTPStatus = 418;
     JSON = {};
 
