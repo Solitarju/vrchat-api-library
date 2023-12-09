@@ -136,16 +136,17 @@ class AvatarsApi {
      * 
      * Delete an avatar. Notice an avatar is never fully "deleted", only its ReleaseStatus is set to "hidden" and the linked Files are deleted. The AvatarID is permanently reserved.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
      */
     async DeleteAvatar(avatarId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!avatarId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Avatar(json);
     }
 
     /**
