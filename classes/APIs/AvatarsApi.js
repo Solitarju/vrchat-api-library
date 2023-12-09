@@ -73,10 +73,12 @@ class AvatarsApi {
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {
             returnArray.push(new Avatar(json[i]));
         }
+        
         return returnArray;
     }
 
@@ -91,8 +93,8 @@ class AvatarsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars`, { method: 'POST', body: JSON.stringify({ assetUrl: assetUrl, id: id, name: name, description: description, tags: tags, imageUrl: imageUrl, releaseStatus: releaseStatus, version: version, unityPackageUrl: unityPackageUrl }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Avatar(json);
     }
 
@@ -100,16 +102,17 @@ class AvatarsApi {
      * 
      * Get information about a specific Avatar by id.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Avatar|Error>} Returns a singule Avatar object.
      */
     async GetAvatar(avatarId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!avatarId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Avatar(json);
     }
 
     /**
