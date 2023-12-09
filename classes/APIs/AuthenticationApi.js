@@ -43,7 +43,7 @@ class AuthenticationApi {
      * 
      * Checks if a user exists on vrchat by using email, username or displayname (prioritizes that order).
      * 
-     * @returns {Promise<UserExists>} UserExists Object inidicating whether user exists.
+     * @returns {Promise<UserExists|Error>} UserExists Object inidicating whether user exists.
      */
     async UserExists({ email = "", username = "", displayName = "", excludeUserId = ""} = {}) {
         if(!email.length > 0 && !displayName.length > 0 && !username.length > 0) return new Error("Missing argument(s): email, displayName or userId", 401, {});
