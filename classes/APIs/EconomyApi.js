@@ -1,6 +1,7 @@
 const { Transaction } = require('../Transaction.js');
 const { UserSubscription } = require('../UserSubscription.js');
 const { Subscription } = require('../Subscription.js');
+const { LicenseGroup } = require('../LicenseGroup.js');
 const { Error } = require('../Error.js');
 
 class EconomyApi {
@@ -107,16 +108,17 @@ class EconomyApi {
      * 
      * Get a single License Group by given ID.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LicenseGroup|Error>} Returns a single LicenseGroup object.
      */
     async GetLicenseGroup(licenseGroupId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!licenseGroupId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!licenseGroupId) return new Error("Missing Argument: licenseGroupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/licenseGroups/${licenseGroupId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new LicenseGroup(json);
     }
 
 }
