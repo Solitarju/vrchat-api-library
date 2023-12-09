@@ -1,6 +1,6 @@
 const { UserExists } = require('../UserExists.js');
-const { Error } = require('../Error.js');
 const { CurrentUser } = require('../CurrentUser.js');
+const { Error } = require('../Error.js');
 
 class AuthenticationApi {
 

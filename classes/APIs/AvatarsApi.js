@@ -1,3 +1,5 @@
+const { Avatar } = require('../Avatar.js');
+const { Error } = require('../Error.js');
 const { Enums, QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
 const Util = require('../Util.js');
 
@@ -45,15 +47,16 @@ class AvatarsApi {
      * 
      * Get the avatar for the current authenticated user.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
      */
     async GetOwnAvatar() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/avatar`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        return new Avatar(json);
     }
 
     /**

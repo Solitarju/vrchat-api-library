@@ -26,3 +26,5 @@ class Avatar {
     };
 
 }
+
+module.exports = { Avatar };
