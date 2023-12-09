@@ -1,3 +1,6 @@
+const { Transaction } = require('../Transaction.js');
+const { Error } = require('../Error.js');
+
 class EconomyApi {
 
     #fetch;
@@ -39,15 +42,21 @@ class EconomyApi {
      * 
      * Get all own Steam transactions.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Transaction>|Error>} Returns an array of Transaction objects.
      */
     async ListSteamTransactions() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/Steam/transactions`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Transaction(json[i]));
+        }
+        return returnArray;
     }
 
     /**
