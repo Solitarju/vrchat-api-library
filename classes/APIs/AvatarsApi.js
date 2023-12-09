@@ -1,4 +1,5 @@
 const { Avatar } = require('../Avatar.js');
+const { CurrentUser } = require('../CurrentUser.js');
 const { Error } = require('../Error.js');
 const { Enums, QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
 const Util = require('../Util.js');
@@ -153,16 +154,17 @@ class AvatarsApi {
      * 
      * Switches authenticated user into that avatar.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<CurrentUser|Error>} Returns a CurrentUser object.
      */
     async SelectAvatar(avatarId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!avatarId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}/select`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new CurrentUser(json);
     }
 
     /**
