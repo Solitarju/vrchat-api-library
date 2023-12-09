@@ -171,32 +171,40 @@ class AvatarsApi {
      * 
      * Switches authenticated user into that avatar as your fallback avatar.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<CurrentUser|Error>} Returns a CurrentUser object.
      */
     async SelectFallbackAvatar(avatarId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!avatarId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}/selectFallback`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new CurrentUser(json);
     }
 
     /**
      * 
      * Search and list favorited avatars by query filters.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Avatar>|Error>} Returns array of Avatar objects.
      */
     async ListFavoritedAvatars({ featured = true, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Avatar(json[i]));
+        }
+
+        return returnArray;
     }
 }
 
