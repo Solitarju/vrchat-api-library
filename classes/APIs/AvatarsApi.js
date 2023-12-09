@@ -63,7 +63,7 @@ class AvatarsApi {
      * 
      * Search and list avatars by query filters. You can only search your own or featured avatars. It is not possible as a normal user to search other peoples avatars.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Avatar>|Error>} Returns array of Avatar objects.
      */
     async SearchAvatars({ featured = false, sort = QuerySort, user = "me", userId = "", n = 60, order = QueryOrder, offset = 0, tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -73,7 +73,11 @@ class AvatarsApi {
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-        return { success: true, res: await res.json() };
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Avatar(json[i]));
+        }
+        return returnArray;
     }
 
     /**
