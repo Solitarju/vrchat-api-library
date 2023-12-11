@@ -1,3 +1,5 @@
+const { Favorite } = require('../Favorite.js');
+const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
 class FavoritesApi {
@@ -44,16 +46,22 @@ class FavoritesApi {
      * 
      * Returns a list of favorites.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Favorite>|Error>} Returns an array of favorite objects.
      */
     async ListFavorites({ n= 60, offset = 0, type = "", tag = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, type, tag });
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Favorite(json[i]));
+        }
+        return returnArray;
     }
 
     /**
