@@ -68,16 +68,17 @@ class FavoritesApi {
      * 
      * Add a new favorite, friend groups are named group_0 through group_3 while Avatar and World groups are named avatars1 to avatars4 and worlds1 to worlds4.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Favorite|Error>} Returns a single Favorite object.
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!type || !favoriteId || tags.length < 1) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!type || !favoriteId || tags.length < 1) return new Error("Missing Argument(s): type, favoriteId or tags", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites`, { method: 'POST', body: JSON.stringify({ type, favoriteId, tags }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Favorite(json);
     }
 
     /**
