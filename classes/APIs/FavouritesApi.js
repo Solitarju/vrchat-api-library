@@ -1,4 +1,5 @@
 const { Favorite } = require('../Favorite.js');
+const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
@@ -102,16 +103,17 @@ class FavoritesApi {
      * 
      * Remove a favorite from your favorites list.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success|Error>} Returns a single Success object.
      */
     async RemoveFavorite(favoriteId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) return new Error("Missing Argument: favoriteId", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
