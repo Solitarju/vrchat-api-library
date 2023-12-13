@@ -85,16 +85,17 @@ class FavoritesApi {
      * 
      * Return information about a specific Favorite.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Favorite|Error>} Returns a single Favorite object.
      */
     async ShowFavorite(favoriteId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) return new Error("Missing Argument: favoriteId", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Favorite(json);
     }
 
     /**
