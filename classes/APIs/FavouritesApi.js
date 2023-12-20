@@ -1,4 +1,5 @@
 const { Favorite } = require('../Favorite.js');
+const { FavoriteGroup } = require('../FavoriteGroup.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
@@ -120,16 +121,18 @@ class FavoritesApi {
      * 
      * Return a list of favorite groups owned by a user.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FavoriteGroup|Error>} Returns a single FavoriteGroup object.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, ownerId });
-        const res = await this.#fetch(`${this.#APIEndpoint}/favorite/groups${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
 
-        return { success: true, res: await res.json() };
+        const res = await this.#fetch(`${this.#APIEndpoint}/favorite/groups${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
+        const json = await res.json();
+
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new FavoriteGroup(json);
     }
 
     /**
