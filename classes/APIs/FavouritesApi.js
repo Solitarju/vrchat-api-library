@@ -121,7 +121,7 @@ class FavoritesApi {
      * 
      * Return a list of favorite groups owned by a user.
      * 
-     * @returns {Promise<FavoriteGroup|Error>} Returns a single FavoriteGroup object.
+     * @returns {Promise<Array<FavoriteGroup>|Error>} Returns an array of FavoriteGroup objects.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -132,7 +132,12 @@ class FavoritesApi {
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-        return new FavoriteGroup(json);
+
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new FavoriteGroup(json[i]));
+        }
+        return returnArray;
     }
 
     /**
