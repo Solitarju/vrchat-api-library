@@ -74,7 +74,7 @@ class FavoritesApi {
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!type || !favoriteId || tags.length < 1) return new Error("Missing Argument(s): type, favoriteId or tags", 400, {});
+        if(!type || !favoriteId || tags.length < 1) return new Error("Required Argument(s): type, favoriteId or tags", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites`, { method: 'POST', body: JSON.stringify({ type, favoriteId, tags }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -91,7 +91,7 @@ class FavoritesApi {
      */
     async ShowFavorite(favoriteId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteId) return new Error("Missing Argument: favoriteId", 401, {});
+        if(!favoriteId) return new Error("Required Argument: favoriteId", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -108,7 +108,7 @@ class FavoritesApi {
      */
     async RemoveFavorite(favoriteId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteId) return new Error("Missing Argument: favoriteId", 401, {});
+        if(!favoriteId) return new Error("Required Argument: favoriteId", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -144,16 +144,17 @@ class FavoritesApi {
      * 
      * Fetch information about a specific favorite group.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FavoriteGroup|Error>} Returns a single FavoriteGroup object.
      */
     async ShowFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId")
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new FavoriteGroup(json);
     }
 
     /**
