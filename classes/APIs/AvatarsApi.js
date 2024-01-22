@@ -48,7 +48,7 @@ class AvatarsApi {
      * 
      * Get the avatar for the current authenticated user.
      * 
-     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
+     * @returns {Promise<Avatar>} Returns a single Avatar object.
      */
     async GetOwnAvatar() {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -64,7 +64,7 @@ class AvatarsApi {
      * 
      * Search and list avatars by query filters. You can only search your own or featured avatars. It is not possible as a normal user to search other peoples avatars.
      * 
-     * @returns {Promise<Array<Avatar>|Error>} Returns array of Avatar objects.
+     * @returns {Promise<Array<Avatar>>} Returns array of Avatar objects.
      */
     async SearchAvatars({ featured = false, sort = QuerySort, user = "me", userId = "", n = 60, order = QueryOrder, offset = 0, tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -87,7 +87,7 @@ class AvatarsApi {
      * 
      * Create an avatar. It's possible to optionally specify a ID if you want a custom one. Attempting to create an Avatar with an already claimed ID will result in a DB error.
      * 
-     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
+     * @returns {Promise<Avatar>} Returns a single Avatar object.
      */
     async CreateAvatar({ assetUrl = "", id = "", name = "", description = "", tags = [], imageUrl = "", releaseStatus = QueryReleaseStatus, version = 1, unityPackageUrl = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -103,7 +103,7 @@ class AvatarsApi {
      * 
      * Get information about a specific Avatar by id.
      * 
-     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
+     * @returns {Promise<Avatar>} Returns a single Avatar object.
      */
     async GetAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -120,7 +120,7 @@ class AvatarsApi {
      * 
      * Update information about a specific avatar.
      * 
-     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
+     * @returns {Promise<Avatar>} Returns a single Avatar object.
      */
     async UpdateAvatar({ assetUrl = "", id = "", name = "", description = "", tags = [], imageUrl = "", releaseStatus = Enums.QueryReleaseStatus.public, version = 1, unityPackageUrl = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -137,7 +137,7 @@ class AvatarsApi {
      * 
      * Delete an avatar. Notice an avatar is never fully "deleted", only its ReleaseStatus is set to "hidden" and the linked Files are deleted. The AvatarID is permanently reserved.
      * 
-     * @returns {Promise<Avatar|Error>} Returns a single Avatar object.
+     * @returns {Promise<Avatar>} Returns a single Avatar object.
      */
     async DeleteAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -154,7 +154,7 @@ class AvatarsApi {
      * 
      * Switches authenticated user into that avatar.
      * 
-     * @returns {Promise<CurrentUser|Error>} Returns a CurrentUser object.
+     * @returns {Promise<CurrentUser>} Returns a CurrentUser object.
      */
     async SelectAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -171,7 +171,7 @@ class AvatarsApi {
      * 
      * Switches authenticated user into that avatar as your fallback avatar.
      * 
-     * @returns {Promise<CurrentUser|Error>} Returns a CurrentUser object.
+     * @returns {Promise<CurrentUser>} Returns a CurrentUser object.
      */
     async SelectFallbackAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -188,7 +188,7 @@ class AvatarsApi {
      * 
      * Search and list favorited avatars by query filters.
      * 
-     * @returns {Promise<Array<Avatar>|Error>} Returns array of Avatar objects.
+     * @returns {Promise<Array<Avatar>>} Returns array of Avatar objects.
      */
     async ListFavoritedAvatars({ featured = true, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});

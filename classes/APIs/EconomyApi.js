@@ -45,7 +45,7 @@ class EconomyApi {
      * 
      * Get all own Steam transactions.
      * 
-     * @returns {Promise<Array<Transaction>|Error>} Returns an array of Transaction objects.
+     * @returns {Promise<Array<Transaction>>} Returns an array of Transaction objects.
      */
     async ListSteamTransactions() {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -66,7 +66,7 @@ class EconomyApi {
      * 
      * Get a list of all current user subscriptions.
      * 
-     * @returns {Promise<Array<UserSubscription>|Error>} Returns an array of UserSubscription objects.
+     * @returns {Promise<Array<UserSubscription>>} Returns an array of UserSubscription objects.
      */
     async GetCurrentSubscriptions() {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -87,7 +87,7 @@ class EconomyApi {
      * 
      * List all existing Subscriptions. For example, "vrchatplus-monthly" and "vrchatplus-yearly".
      * 
-     * @returns {Promise<Array<Subscription>|Error>} Returns an array of Subscription objects.
+     * @returns {Promise<Array<Subscription>>} Returns an array of Subscription objects.
      */
     async ListSubscriptions() {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -108,7 +108,7 @@ class EconomyApi {
      * 
      * Get a single License Group by given ID.
      * 
-     * @returns {Promise<LicenseGroup|Error>} Returns a single LicenseGroup object.
+     * @returns {Promise<LicenseGroup>} Returns a single LicenseGroup object.
      */
     async GetLicenseGroup(licenseGroupId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});

@@ -48,7 +48,7 @@ class FavoritesApi {
      * 
      * Returns a list of favorites.
      * 
-     * @returns {Promise<Array<Favorite>|Error>} Returns an array of favorite objects.
+     * @returns {Promise<Array<Favorite>>} Returns an array of favorite objects.
      */
     async ListFavorites({ n= 60, offset = 0, type = "", tag = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -70,7 +70,7 @@ class FavoritesApi {
      * 
      * Add a new favorite, friend groups are named group_0 through group_3 while Avatar and World groups are named avatars1 to avatars4 and worlds1 to worlds4.
      * 
-     * @returns {Promise<Favorite|Error>} Returns a single Favorite object.
+     * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -87,7 +87,7 @@ class FavoritesApi {
      * 
      * Return information about a specific Favorite.
      * 
-     * @returns {Promise<Favorite|Error>} Returns a single Favorite object.
+     * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async ShowFavorite(favoriteId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -104,7 +104,7 @@ class FavoritesApi {
      * 
      * Remove a favorite from your favorites list.
      * 
-     * @returns {Promise<Success|Error>} Returns a single Success object.
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async RemoveFavorite(favoriteId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -121,7 +121,7 @@ class FavoritesApi {
      * 
      * Return a list of favorite groups owned by a user.
      * 
-     * @returns {Promise<Array<FavoriteGroup>|Error>} Returns an array of FavoriteGroup objects.
+     * @returns {Promise<Error|Array<FavoriteGroup>>} Returns an array of FavoriteGroup objects.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -144,7 +144,7 @@ class FavoritesApi {
      * 
      * Fetch information about a specific favorite group.
      * 
-     * @returns {Promise<FavoriteGroup|Error>} Returns a single FavoriteGroup object.
+     * @returns {Promise<FavoriteGroup>} Returns a single FavoriteGroup object.
      */
     async ShowFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -161,7 +161,7 @@ class FavoritesApi {
      * 
      * Update information about a specific favorite group.
      * 
-     * @returns {Promise<Number|Error>} Returns HTTP Status of the request.
+     * @returns {Promise<Number>} Returns HTTP Status of the request.
      */
     async UpdateFavoriteGroup({ favoriteGroupType = "", favoriteGroupName = "", userId = "", displayName = "", visibility = "", tags = [] } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
