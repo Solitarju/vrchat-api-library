@@ -46,7 +46,7 @@ class FilesApi {
      * 
      * Returns a list of files.
      * 
-     * @returns {Promise<Array<File>>} Returns an array of file objects.
+     * @returns {Promise<Array<File>>} Returns an array of File objects.
      */
     async ListFiles({ tag = "", n = 60, offset = 0 } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -68,19 +68,20 @@ class FilesApi {
      * 
      * Creates a new File object.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<File>} Returns a single File object.
      */
     async CreateFile({ name = "", mimeType = "", extension = "", tags = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!name || !mimeType || !extension) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!name || !mimeType || !extension) return new Error("Required Argument(s): name, mimeType, extension", 400, {});
 
         const bodyData = { name, mimeType, extension };
         if(tags.length > 0) bodyData.tags = tags;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file`, { method: 'POST', body: JSON.stringify(bodyData), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new File(json);
     }
 
     /**
