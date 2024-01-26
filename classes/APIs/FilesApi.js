@@ -1,3 +1,5 @@
+const File = require('../File.js');
+const Error = require('../Error.js');
 const Util = require('../Util.js');
 
 class FilesApi {
@@ -44,16 +46,22 @@ class FilesApi {
      * 
      * Returns a list of files.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<File>>} Returns an array of file objects.
      */
     async ListFiles({ tag = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ tag, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/files${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new File(json[i]));
+        }
+        return returnArray;
     }
 
     /**
