@@ -1,5 +1,6 @@
-const File = require('../File.js');
-const Error = require('../Error.js');
+const { File } = require('../File.js');
+const { Success } = require('../Success.js');
+const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
 class FilesApi {
@@ -126,16 +127,17 @@ class FilesApi {
      * 
      * Deletes a File object.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteFile(fileId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!fileId) return new Error("Missing Argument: fileId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
