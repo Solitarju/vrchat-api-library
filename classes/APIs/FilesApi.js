@@ -105,20 +105,21 @@ class FilesApi {
      * 
      * Creates a new FileVersion. Once a Version has been created, proceed to the /file/{fileId}/{versionId}/file/start endpoint to start a file upload.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<File>} Returns a single File object.
      */
     async CreateFileVersion({ fileId = "", signatureMd5 = "", signatureSizeInBytes = 0, fileMd5 = "", fileSizeInBytes = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId || !signatureMd5 || !signatureSizeInBytes) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!fileId || !signatureMd5 || !signatureSizeInBytes) return new Error("Missing Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
 
         const bodyData = { signatureMd5, signatureSizeInBytes };
         if(fileMd5) bodyData.fileMd5 = fileMd5;
         if(fileSizeInBytes) bodyData.fileSizeInBytes = fileSizeInBytes;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { method: 'POST', body: JSON.stringify(bodyData), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new File(json);
     }
 
     /**
