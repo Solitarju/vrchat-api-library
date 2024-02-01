@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { File } = require('../File.js');
+const { FileUpload } = require('../FileUpload.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
@@ -226,16 +227,17 @@ class FilesApi {
      * 
      * Starts an upload of a specific FilePart. This endpoint will return an AWS URL which you can PUT data to. You need to call this and receive a new AWS API URL for each partNumber. Please see AWS's REST documentation on "PUT Object to S3" on how to upload. Once all parts have been uploaded, proceed to /finish endpoint.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FileUpload>} Returns a single FileUpload object.
      */
     async StartFileDataUpload(fileId = "", versionId = "", fileType = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId || !versionId || !fileType) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/start`, { method: 'PUT', headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new FileUpload(json);
     }
 
     /**
