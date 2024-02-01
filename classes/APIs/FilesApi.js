@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { File } = require('../File.js');
 const { FileUpload } = require('../FileUpload.js');
+const { FileVersionUploadStatus } = require('../FileVersionUploadStatus.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
@@ -244,16 +245,17 @@ class FilesApi {
      * 
      * Retrieves the upload status for file upload. Can currently only be accessed when status is waiting. Trying to access it on a file version already uploaded currently times out.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FileVersionUploadStatus>} Returns a single FileVersionUploadStatus object.
      */
     async CheckFileDataUploadStatus(fileId = "", versionId = "", fileType = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId || !versionId || !fileType) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/status`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new FileVersionUploadStatus(json);
     }
 
 }
