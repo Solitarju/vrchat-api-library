@@ -208,17 +208,18 @@ class FilesApi {
      * 
      * Finish an upload of a FileData. This will mark it as "complete". After uploading the file for Avatars and Worlds you then have to upload a signature file.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<File>} Returns a single File object.
      */
     async FinishFileDataUpload({fileId = "", versionId = "", fileType = "", etags = []} = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId || !versionId || !fileType) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
 
         const bodyData = etags.length > 0 ? { etags } : "";
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/finish`, { method: 'PUT', body: bodyData ? JSON.stringify(bodyData) : "", headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new File(json);
     }
 
     /**
