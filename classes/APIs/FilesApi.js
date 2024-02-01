@@ -195,7 +195,7 @@ class FilesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteFileVersion(fileId = "", versionId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!fileId || !versionId) return new Error("Missing Argument(s): fileId, versionId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
@@ -212,7 +212,7 @@ class FilesApi {
      * @returns {Promise<File>} Returns a single File object.
      */
     async FinishFileDataUpload({fileId = "", versionId = "", fileType = "", etags = []} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
 
         const bodyData = etags.length > 0 ? { etags } : "";
