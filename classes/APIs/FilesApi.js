@@ -145,7 +145,7 @@ class FilesApi {
      * 
      * Downloads the file with the provided version number. Does not write to disk, only downloads raw file data to memory unless optionalDownloadPath parameter is specified.
      * 
-     * **optionalDownloadPath Note:** Automatically writes raw file data to file path. Does not automatically append file extension.
+     * **optionalDownloadPath Note:** Automatically writes raw file data to file path. Does not automatically append file extension and does not check download path validity.
      * 
      * **Version Note:** Version 0 is always when the file was created. The real data is usually always located in version 1 and up.
      * 
@@ -157,37 +157,34 @@ class FilesApi {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!fileId || !versionId) return new Error("Required Argument(s): fileId, VersionId", 400, {});
 
-        let buffers = [];
-
-        const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { headers: this.#GenerateHeaders(true) }).then(async res => {
+        let buffer = [];
+        let res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { headers: this.#GenerateHeaders(true) }).then(async res => {
             await new Promise((resolve, reject) => {
                 res.body.on('readable', () => {
                     let data;
                     while((data = res.body.read()) !== null) {
-                        buffers.push(data);
+                        buffer.push(data);
                     }
                 })
                 
                 res.body.on('error', reject);
                 res.body.on('end', () => {
-                    buffers = Buffer.concat(buffers);
+                    buffer = Buffer.concat(buffer);
                     resolve();
                 })
-            })
+            });
 
             return res;
-        })
+        });
 
         let fileWriteError;
         if(optionalDownloadPath) {
-            fs.writeFile(optionalDownloadPath, buffers, (err) => { fileWriteError = err });
+            fs.writeFile(optionalDownloadPath, buffer, (err) => { fileWriteError = err });
         }
 
-        const json = await res.json();
-
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-        if(fileWriteError !== null) return fileWriteError;
-        return buffers;
+        if(!res.ok) return new Error("No error message obtainable. Check status code.", res.status, {});
+        if(fileWriteError) return fileWriteError;
+        return buffer;
     }
 
     /**
