@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { File } = require('../File.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
@@ -142,18 +143,51 @@ class FilesApi {
 
     /**
      * 
-     * Downloads the file with the provided version number. (Please read extra notes here https://vrchatapi.github.io/docs/api/#get-/favorites/-favoriteId-)
+     * Downloads the file with the provided version number. Does not write to disk, only downloads raw file data to memory unless optionalDownloadPath parameter is specified.
      * 
-     * @returns {Promise<JSON>}
+     * **optionalDownloadPath Note:** Automatically writes raw file data to file path. Does not automatically append file extension.
+     * 
+     * **Version Note:** Version 0 is always when the file was created. The real data is usually always located in version 1 and up.
+     * 
+     * **Extension Note:** Files are not guaranteed to have a file extensions. UnityPackage files tends to have it, images through this endpoint do not. You are responsible for appending file extension from the extension field when neccesary.
+     * 
+     * @returns {Promise<Buffer>} Returns the raw file data in a Buffer object.
      */
-    async DownloadFileVersion(fileId = "", versionId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!fileId || !versionId) return { success: false, status: 400 };
+    async DownloadFileVersion(fileId = "", versionId = 0, optionalDownloadPath = "") {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId) return new Error("Required Argument(s): fileId, VersionId", 400, {});
 
-        const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        let buffers = [];
 
-        return { success: true, res: await res.json() };
+        const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { headers: this.#GenerateHeaders(true) }).then(async res => {
+            await new Promise((resolve, reject) => {
+                res.body.on('readable', () => {
+                    let data;
+                    while((data = res.body.read()) !== null) {
+                        buffers.push(data);
+                    }
+                })
+                
+                res.body.on('error', reject);
+                res.body.on('end', () => {
+                    buffers = Buffer.concat(buffers);
+                    resolve();
+                })
+            })
+
+            return res;
+        })
+
+        let fileWriteError;
+        if(optionalDownloadPath) {
+            fs.writeFile(optionalDownloadPath, buffers, (err) => { fileWriteError = err });
+        }
+
+        const json = await res.json();
+
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(fileWriteError !== null) return fileWriteError;
+        return buffers;
     }
 
     /**
