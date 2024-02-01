@@ -231,7 +231,7 @@ class FilesApi {
      */
     async StartFileDataUpload(fileId = "", versionId = "", fileType = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 401, {});
+        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/start`, { method: 'PUT', headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
