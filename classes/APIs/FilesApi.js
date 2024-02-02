@@ -78,8 +78,8 @@ class FilesApi {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!name || !mimeType || !extension) return new Error("Required Argument(s): name, mimeType, extension", 400, {});
 
-        const bodyData = { name, mimeType, extension };
-        if(tags.length > 0) bodyData.tags = tags;
+        let bodyData = { name, mimeType, extension };
+        if(tags) bodyData.tags = tags;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file`, { method: 'POST', body: JSON.stringify(bodyData), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -115,7 +115,7 @@ class FilesApi {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!fileId || !signatureMd5 || !signatureSizeInBytes) return new Error("Required Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
 
-        const bodyData = { signatureMd5, signatureSizeInBytes };
+        let bodyData = { signatureMd5, signatureSizeInBytes };
         if(fileMd5) bodyData.fileMd5 = fileMd5;
         if(fileSizeInBytes) bodyData.fileSizeInBytes = fileSizeInBytes;
 
@@ -216,8 +216,8 @@ class FilesApi {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
-        const bodyData = etags.length > 0 ? { etags } : "";
-        const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/finish`, { method: 'PUT', body: bodyData ? JSON.stringify(bodyData) : "", headers: this.#GenerateHeaders(true, "application/json") });
+        let bodyData = etags.length > 0 ? JSON.stringify({ etags }) : "";
+        const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/finish`, { method: 'PUT', body: bodyData, headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
