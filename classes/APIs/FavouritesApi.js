@@ -74,7 +74,7 @@ class FavoritesApi {
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!type || !favoriteId || tags.length < 1) return new Error("Required Argument(s): type, favoriteId or tags", 400, {});
+        if(!type || !favoriteId || !tags.length > 0) return new Error("Required Argument(s): type, favoriteId, tags", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites`, { method: 'POST', body: JSON.stringify({ type, favoriteId, tags }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -121,13 +121,12 @@ class FavoritesApi {
      * 
      * Return a list of favorite groups owned by a user.
      * 
-     * @returns {Promise<Error|Array<FavoriteGroup>>} Returns an array of FavoriteGroup objects.
+     * @returns {Promise<Array<FavoriteGroup>>} Returns an array of FavoriteGroup objects.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, ownerId });
-
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/groups${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
@@ -167,7 +166,9 @@ class FavoritesApi {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
-        const params = { displayName, visibility };
+        let params = {};
+        if(displayName) params.displayName = displayName;
+        if(visibility) params.visibility = visibility;
         if(tags.length > 0) params.tags = tags;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { method: 'PUT', body: JSON.stringify(params), headers: this.#GenerateHeaders(true, "application/json") });
