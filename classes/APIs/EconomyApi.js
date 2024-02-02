@@ -112,7 +112,7 @@ class EconomyApi {
      */
     async GetLicenseGroup(licenseGroupId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!licenseGroupId) return new Error("Missing Argument: licenseGroupId", 400, {});
+        if(!licenseGroupId) return new Error("Required Argument: licenseGroupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/licenseGroups/${licenseGroupId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
