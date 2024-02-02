@@ -49,8 +49,8 @@ class UsersApi {
      * @returns {Promise<LimitedUser>} Queries for users and returns an array of LimitedUser objects.
      */
     async SearchAllUsers({ displayName = "", returnAmount = 1, offset = 0 } = {}) {
-        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
-        if(!displayName.length > 0) return new Error("Missing argument(s).", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!displayName) return new Error("Required argument: displayName", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users?search=${displayName}${returnAmount > 0 && returnAmount < 100 ? "&n=" + returnAmount : ""}${offset > 0 ? "&offset" + offset : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -72,8 +72,8 @@ class UsersApi {
      * @returns {Promise<User>} Returns User object.
      */
     async GetUserById(userid = "") {
-        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
-        if(!userid.length > 0) return new Error("Missing argument(s).", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!userid) return new Error("Required argument: userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -89,8 +89,8 @@ class UsersApi {
      * @returns {Promise<JSON>} Returns updated CurrentUser object.
      */
     async UpdateUserInfo({email = "", birthday = "", tags = [], status = "", statusDescription = "", bio = "", bioLinks = []} = {}) {
-        if(!this.#authCookie.length > 0) return new Error("Invalid Credentials.", 401, {});
-        if(!email && !birthday && !tags && !status && !statusDescription && !bio && !bioLinks) return new Error("Missing argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!email || !birthday || !tags || !status || !statusDescription || !bio || !bioLinks) return new Error("Required argument(s): email, birthday, tags, status, statusDescription, bio, bioLinks", 400, {});
 
         tags.length > 0 ? tags : tags = false;
         bioLinks.length > 0 ? bioLinks : bioLinks = false;
@@ -115,7 +115,7 @@ class UsersApi {
      * @returns {Promise<Group>} Returns an array of users Group objects.
      */
     async GetUserGroups() {
-        if(!this.#authCookie.length > 0) return new Error('Invalid Credentials.', 401, {});
+        if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -135,7 +135,7 @@ class UsersApi {
      * @returns {Promise<Group>} Returns an array of users group requests.
      */
     async GetUserGroupRequests() {
-        if(!this.#authCookie.length > 0) return new Error('Invalid Credentials.', 401, {});
+        if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups/requested`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();

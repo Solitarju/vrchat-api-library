@@ -49,8 +49,8 @@ class InstancesApi {
      * @returns {Promise<Instance>} 
      */
     async GetInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -66,8 +66,8 @@ class InstancesApi {
      * @returns {Promise<JSON>} 
      */
     async GetInstanceShortName(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}/shortName`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -83,8 +83,8 @@ class InstancesApi {
      * @returns {Promise<Success>} 
      */
     async SendSelfInvite(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -100,8 +100,8 @@ class InstancesApi {
      * @returns {Promise<Instance>} 
      */
     async GetInstanceByShortName(shortName = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!shortName) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!shortName) return new Error("Required Argument: shortName", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();

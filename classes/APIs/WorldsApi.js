@@ -53,7 +53,7 @@ class WorldsApi {
      * @returns {Promise<LimitedWorld>}
      */
     async SearchAllWorlds({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
@@ -74,8 +74,8 @@ class WorldsApi {
      * @returns {Promise<World>}
      */
     async CreateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!assetUrl || !imageUrl || !name) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!assetUrl || !imageUrl || !name) return new Error("Required Argument(s): assetUrl, imageUrl, name", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -91,7 +91,7 @@ class WorldsApi {
      * @returns {Promise<LimitedWorld>}
     */
     async ListActiveWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/active${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
@@ -112,7 +112,7 @@ class WorldsApi {
      * @returns {Promise<LimitedWorld>}
      */
     async ListFavoritedWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
@@ -133,7 +133,7 @@ class WorldsApi {
      * @returns {Promise<LimitedWorld}
      */
     async ListRecentWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/recent${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
@@ -154,7 +154,7 @@ class WorldsApi {
      * @returns {Promise<World>}
      */
     async GetWorldById(worldId = "") {
-        if(!worldId) return new Error("Missing Argument(s)", 400, {});
+        if(!worldId) return new Error("Required Argument: worldId", 400, {});
 
         const headers = this.#authCookie ? this.#GenerateHeaders(true) : this.#GenerateHeaders(); // Use authenticated over unauthenticated, but no auth still works just returns 0 in some fields.
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { headers: headers });
@@ -171,8 +171,8 @@ class WorldsApi {
      * @returns {Promise<World>}
      */
     async UpdateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!id) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!id) return new Error("Required Argument: id", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${id}`, { method: 'PUT', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -188,8 +188,8 @@ class WorldsApi {
      * @returns {Promise<JSON>}
      */
     async DeleteWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId) return new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -205,8 +205,8 @@ class WorldsApi {
      * @returns {Promise<WorldPublishStatus>}
      */
     async GetWorldPublishStatus(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId) return new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -222,8 +222,8 @@ class WorldsApi {
      * @returns {Promise<JSON>} ??? Unsure of the response object type.
      */
     async PublishWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId) return new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -239,8 +239,8 @@ class WorldsApi {
      * @returns {Promise<JSON>}
      */
     async UnpublishWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId) return new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -256,8 +256,8 @@ class WorldsApi {
      * @returns {Promise<Instance>}
      */
     async GetWorldInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!worldId || !instanceId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();

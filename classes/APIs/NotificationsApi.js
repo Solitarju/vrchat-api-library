@@ -51,7 +51,7 @@ class NotificationsApi {
      * @returns {Promise<Notification>}
      */
     async ListNotifications({ hidden = false, after = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ hidden, after, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
@@ -72,8 +72,8 @@ class NotificationsApi {
      * @returns {Promise<Success>}
      */
     async AcceptFriendRequest(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/accept`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -89,8 +89,8 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async MarkNotificationAsRead(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/see`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -106,8 +106,8 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async DeleteNotification(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
-        if(!notificationId) return new Error("Missing Argument(s)", 400, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/hide`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -123,7 +123,7 @@ class NotificationsApi {
      * @returns {Promise<JSON>}
      */
     async ClearAllNotifications() {
-        if(!this.#authCookie) return new Error("Invalid Credentials.", 401, {});
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/clear`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();

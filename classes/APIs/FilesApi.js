@@ -113,7 +113,7 @@ class FilesApi {
      */
     async CreateFileVersion({ fileId = "", signatureMd5 = "", signatureSizeInBytes = 0, fileMd5 = "", fileSizeInBytes = 0 } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !signatureMd5 || !signatureSizeInBytes) return new Error("Missing Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
+        if(!fileId || !signatureMd5 || !signatureSizeInBytes) return new Error("Required Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
 
         const bodyData = { signatureMd5, signatureSizeInBytes };
         if(fileMd5) bodyData.fileMd5 = fileMd5;
@@ -134,7 +134,7 @@ class FilesApi {
      */
     async DeleteFile(fileId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId) return new Error("Missing Argument: fileId", 400, {});
+        if(!fileId) return new Error("Required Argument: fileId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -197,7 +197,7 @@ class FilesApi {
      */
     async DeleteFileVersion(fileId = "", versionId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId) return new Error("Missing Argument(s): fileId, versionId", 400, {});
+        if(!fileId || !versionId) return new Error("Required Argument(s): fileId, versionId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -214,7 +214,7 @@ class FilesApi {
      */
     async FinishFileDataUpload({fileId = "", versionId = "", fileType = "", etags = []} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
+        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         const bodyData = etags.length > 0 ? { etags } : "";
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/finish`, { method: 'PUT', body: bodyData ? JSON.stringify(bodyData) : "", headers: this.#GenerateHeaders(true, "application/json") });
@@ -232,7 +232,7 @@ class FilesApi {
      */
     async StartFileDataUpload(fileId = "", versionId = "", fileType = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
+        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/start`, { method: 'PUT', headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -249,7 +249,7 @@ class FilesApi {
      */
     async CheckFileDataUploadStatus(fileId = "", versionId = "", fileType = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Missing Argument(s): fileId, versionId, fileType", 400, {});
+        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/status`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
