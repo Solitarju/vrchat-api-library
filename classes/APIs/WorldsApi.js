@@ -1,10 +1,10 @@
-const Util = require('../Util.js');
 const { QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
+const { Instance } = require('../Instance.js');
 const { World } = require('../World.js');
 const { LimitedWorld } = require('../LimitedWorld.js');
 const { WorldPublishStatus } = require('../WorldPublishStatus.js');
-const { Instance } = require('../Instance.js');
 const { Error } = require('../Error.js');
+const Util = require('../Util.js');
 
 class WorldsApi {
 
@@ -50,7 +50,7 @@ class WorldsApi {
      * 
      * Search and list any worlds by query filters.
      * 
-     * @returns {Promise<LimitedWorld>}
+     * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async SearchAllWorlds({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -58,6 +58,7 @@ class WorldsApi {
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
@@ -71,7 +72,7 @@ class WorldsApi {
      * 
      * Create a new world. This endpoint requires assetUrl to be a valid File object with .vrcw file extension, and imageUrl to be a valid File object with an image file extension.
      * 
-     * @returns {Promise<World>}
+     * @returns {Promise<World>} Returns a single World object.
      */
     async CreateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -79,8 +80,8 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
     
@@ -88,7 +89,7 @@ class WorldsApi {
      * 
      * Search and list currently active worlds by query filters.
      * 
-     * @returns {Promise<LimitedWorld>}
+     * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
     */
     async ListActiveWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -96,6 +97,7 @@ class WorldsApi {
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/active${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         
         var returnArray = [];
@@ -109,7 +111,7 @@ class WorldsApi {
      * 
      * Search and list favorited worlds by query filters.
      * 
-     * @returns {Promise<LimitedWorld>}
+     * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async ListFavoritedWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -117,6 +119,7 @@ class WorldsApi {
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
@@ -130,7 +133,7 @@ class WorldsApi {
      * 
      * Search and list recently visited worlds by query filters.
      * 
-     * @returns {Promise<LimitedWorld}
+     * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async ListRecentWorlds({ featured = false, sort = QuerySort, n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "", userId = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -138,6 +141,7 @@ class WorldsApi {
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/recent${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
@@ -151,7 +155,7 @@ class WorldsApi {
      * 
      * Get information about a specific World. Works unauthenticated but when so will always return 0 for certain fields.
      * 
-     * @returns {Promise<World>}
+     * @returns {Promise<World>} Returns a single World object.
      */
     async GetWorldById(worldId = "") {
         if(!worldId) return new Error("Required Argument: worldId", 400, {});
@@ -159,8 +163,8 @@ class WorldsApi {
         const headers = this.#authCookie ? this.#GenerateHeaders(true) : this.#GenerateHeaders(); // Use authenticated over unauthenticated, but no auth still works just returns 0 in some fields.
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { headers: headers });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
 
@@ -168,7 +172,7 @@ class WorldsApi {
      * 
      * Update information about a specific World.
      * 
-     * @returns {Promise<World>}
+     * @returns {Promise<World>} Returns a single World object.
      */
     async UpdateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -176,8 +180,8 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${id}`, { method: 'PUT', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
 
@@ -185,7 +189,7 @@ class WorldsApi {
      * 
      * Delete a world. Notice a world is never fully "deleted", only its ReleaseStatus is set to "hidden" and the linked Files are deleted. The WorldID is permanently reserved.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Number>} Returns HTTP status code.
      */
     async DeleteWorld(worldId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -193,16 +197,16 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: json };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
      * 
      * Returns a worlds publish status.
      * 
-     * @returns {Promise<WorldPublishStatus>}
+     * @returns {Promise<WorldPublishStatus>} Returns a single WorldPublishStatus object.
      */
     async GetWorldPublishStatus(worldId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -210,8 +214,8 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new WorldPublishStatus(json);
     }
 
@@ -219,7 +223,7 @@ class WorldsApi {
      * 
      * Publish a world. You can only publish one world per week.
      * 
-     * @returns {Promise<JSON>} ??? Unsure of the response object type.
+     * @returns {Promise<Number>} Returns HTTP status code.
      */
     async PublishWorld(worldId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -227,16 +231,16 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: json };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
      * 
      * Unpublish a world. This does not delete a world, only makes it "private".
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Number>} Returns HTTP status code.
      */
     async UnpublishWorld(worldId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -244,16 +248,16 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: json };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
      * 
      * Returns a worlds instance.
      * 
-     * @returns {Promise<Instance>}
+     * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetWorldInstance(worldId = "", instanceId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -261,8 +265,8 @@ class WorldsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+        
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-
         return new Instance(json);
     }
 
