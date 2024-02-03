@@ -1,4 +1,5 @@
 const { Instance } = require('../Instance.js');
+const { InstanceShortName } = require('../InstanceShortName.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 
@@ -63,7 +64,7 @@ class InstancesApi {
      * 
      * Returns an instance short name.
      * 
-     * @returns {Promise<JSON>} 
+     * @returns {Promise<InstanceShortName>} Returns a single InstanceShortName object. 
      */
     async GetInstanceShortName(worldId = "", instanceId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -73,7 +74,7 @@ class InstancesApi {
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-        return { success: true, res: await res.json() };
+        return new InstanceShortName(json);
     }
 
     /**
@@ -105,7 +106,7 @@ class InstancesApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, res);
         return new Instance(json);
     }
