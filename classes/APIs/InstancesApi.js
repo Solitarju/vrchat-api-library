@@ -46,7 +46,7 @@ class InstancesApi {
      * 
      * If an invalid instanceId is provided, this endpoint will simply return "null"!
      * 
-     * @returns {Promise<Instance>} 
+     * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstance(worldId = "", instanceId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -54,8 +54,8 @@ class InstancesApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Instance(json);
     }
 
@@ -71,8 +71,8 @@ class InstancesApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}/shortName`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return { success: true, res: await res.json() };
     }
 
@@ -80,7 +80,7 @@ class InstancesApi {
      * 
      * Sends an invite to the instance to yourself.
      * 
-     * @returns {Promise<Success>} 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async SendSelfInvite(worldId = "", instanceId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -88,8 +88,8 @@ class InstancesApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -97,7 +97,7 @@ class InstancesApi {
      * 
      * Returns an instance.
      * 
-     * @returns {Promise<Instance>} 
+     * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstanceByShortName(shortName = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -105,8 +105,8 @@ class InstancesApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+        
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, res);
-
         return new Instance(json);
     }
 
