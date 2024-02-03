@@ -1,7 +1,7 @@
-const Util = require('../Util.js');
 const { Notification } = require('../Notification.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
+const Util = require('../Util.js');
 
 class NotificationsApi {
 
@@ -48,7 +48,7 @@ class NotificationsApi {
      * 
      * Retrieve all of the current user's notifications.
      *  
-     * @returns {Promise<Notification>}
+     * @returns {Promise<Notification>} Returns an array of Notification objects.
      */
     async ListNotifications({ hidden = false, after = "", n = 60, offset = 0 } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -56,6 +56,7 @@ class NotificationsApi {
         const params = this.#GenerateParameters({ hidden, after, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
@@ -69,7 +70,7 @@ class NotificationsApi {
      * 
      * Accept a friend request by notification frq_ ID. Friend requests can be found using the NotificationsAPI getNotifications by filtering of type friendRequest.
      *  
-     * @returns {Promise<Success>}
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async AcceptFriendRequest(notificationId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -77,8 +78,8 @@ class NotificationsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/accept`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+        
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-
         return new Success(json);
     }
 
