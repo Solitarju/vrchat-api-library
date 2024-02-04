@@ -87,7 +87,7 @@ class NotificationsApi {
      * 
      * Mark a notification as seen.
      *  
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async MarkNotificationAsRead(notificationId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -95,8 +95,8 @@ class NotificationsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/see`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -104,7 +104,7 @@ class NotificationsApi {
      * 
      * Delete a notification.
      *  
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async DeleteNotification(notificationId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -112,8 +112,8 @@ class NotificationsApi {
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/hide`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -121,15 +121,15 @@ class NotificationsApi {
      * 
      * Clear **all** notifications.
      *  
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>} Returns a single success object.
      */
     async ClearAllNotifications() {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/clear`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
+        
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
-
         return new Success(json);
     }
 
