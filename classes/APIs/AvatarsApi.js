@@ -1,7 +1,7 @@
+const { Enums, QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
 const { Avatar } = require('../Avatar.js');
 const { CurrentUser } = require('../CurrentUser.js');
 const { Error } = require('../Error.js');
-const { Enums, QueryReleaseStatus, QuerySort, QueryOrder } = require('./Enums.js');
 const Util = require('../Util.js');
 
 class AvatarsApi {
@@ -64,7 +64,7 @@ class AvatarsApi {
      * 
      * Search and list avatars by query filters. You can only search your own or featured avatars. It is not possible as a normal user to search other peoples avatars.
      * 
-     * @returns {Promise<Array<Avatar>>} Returns array of Avatar objects.
+     * @returns {Promise<Array<Avatar>>} Returns an array of Avatar objects.
      */
     async SearchAvatars({ featured = false, sort = QuerySort, user = "me", userId = "", n = 60, order = QueryOrder, offset = 0, tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -79,7 +79,6 @@ class AvatarsApi {
         for(let i = 0; i < json.length; i++) {
             returnArray.push(new Avatar(json[i]));
         }
-
         return returnArray;
     }
 
@@ -107,7 +106,7 @@ class AvatarsApi {
      */
     async GetAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
+        if(!avatarId) return new Error("Required Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -124,7 +123,7 @@ class AvatarsApi {
      */
     async UpdateAvatar({ assetUrl = "", id = "", name = "", description = "", tags = [], imageUrl = "", releaseStatus = Enums.QueryReleaseStatus.public, version = 1, unityPackageUrl = "" } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!id) return new Error("Missing Argument: id", 400, {});
+        if(!id) return new Error("Required Argument: id", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${id}`, { method: 'PUT', body: JSON.stringify({ assetUrl: assetUrl, id: id, name: name, description: description, tags: tags, imageUrl: imageUrl, releaseStatus: releaseStatus, version: version, unityPackageUrl: unityPackageUrl }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -141,7 +140,7 @@ class AvatarsApi {
      */
     async DeleteAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
+        if(!avatarId) return new Error("Required Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -175,7 +174,7 @@ class AvatarsApi {
      */
     async SelectFallbackAvatar(avatarId = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!avatarId) return new Error("Missing Argument: avatarId", 400, {});
+        if(!avatarId) return new Error("Required Argument: avatarId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/avatars/${avatarId}/selectFallback`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -203,7 +202,6 @@ class AvatarsApi {
         for(let i = 0; i < json.length; i++) {
             returnArray.push(new Avatar(json[i]));
         }
-
         return returnArray;
     }
 }
