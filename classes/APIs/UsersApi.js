@@ -46,7 +46,7 @@ class UsersApi {
      * 
      * Searches for users by displayname.
      * 
-     * @returns {Promise<Array<LimitedUser>>} Queries for users and returns an array of LimitedUser objects.
+     * @returns {Promise<Array<LimitedUser>>} Returns an array of LimitedUser objects.
      */
     async SearchAllUsers({ displayName = "", returnAmount = 1, offset = 0 } = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -68,7 +68,7 @@ class UsersApi {
      * 
      * Gets user object from userid.
      * 
-     * @returns {Promise<User>} Returns User object.
+     * @returns {Promise<User>} Returns a single User object.
      */
     async GetUserById(userid = "") {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
@@ -83,14 +83,29 @@ class UsersApi {
 
     /**
      * 
-     * Updates current user information such as bio and status etc.
+     * Updates current users information such as bio and status etc.
      * 
-     * @returns {Promise<CurrentUser>} Returns updated CurrentUser object.
+     * @param {Object} [json={}]
+     * @param {string} [json.email=""]
+     * @param {string} [json.birthday=""]
+     * @param {string[]} [json.tags=[]]
+     * @param {string} [json.status=""]
+     * @param {string} [json.statusDescription=""]
+     * @param {string} [json.bio=""]
+     * @param {string[]} [json.bioLinks=[]]
+     * 
+     * @returns {Promise<CurrentUser>} Returns an updated CurrentUser object.
      */
-    async UpdateUserInfo({email = "", birthday = "", tags = [], status = "", statusDescription = "", bio = "", bioLinks = []} = {}) {
+    async UpdateUserInfo({email, birthday, tags, status, statusDescription, bio, bioLinks} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
-        const bodyJSON = { email, birthday, tags, status, statusDescription, bio, bioLinks };
+        const args = {email, birthday, tags, status, statusDescription, bio, bioLinks};
+        let bodyJSON = {};
+        for(let i = 0; i < 7; i++) {
+            let key = Object.keys(args)[i];
+            if(args[key] !== undefined) bodyJSON[key] = args[key];
+        }
+
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { method: "PUT", headers: this.#GenerateHeaders(true, "application/json"), body: JSON.stringify(bodyJSON) });
         const json = await res.json();
 
@@ -102,7 +117,7 @@ class UsersApi {
      * 
      * Gets current users groups.
      * 
-     * @returns {Promise<Array<Group>>} Returns an array of users Group objects.
+     * @returns {Promise<Array<Group>>} Returns an array of Group objects.
      */
     async GetUserGroups() {
         if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
@@ -121,9 +136,9 @@ class UsersApi {
 
     /**
      * 
-     * Gets current user group requests.
+     * Gets current users group requests.
      * 
-     * @returns {Promise<Array<Group>>} Returns an array of users group requests.
+     * @returns {Promise<Array<Group>>} Returns an array of group requests.
      */
     async GetUserGroupRequests() {
         if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
