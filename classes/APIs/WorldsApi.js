@@ -88,13 +88,36 @@ class WorldsApi {
      * 
      * Create a new world. This endpoint requires assetUrl to be a valid File object with .vrcw file extension, and imageUrl to be a valid File object with an image file extension.
      * 
+     * @param {Object} [json={}] 
+     * @param {string} [json.assetUrl=""] 
+     * @param {number} [json.assetVersion=0] 
+     * @param {string} [json.authorId=""] 
+     * @param {string} [json.authorName=""] 
+     * @param {number} [json.capacity=0] 
+     * @param {string} [json.description=""] 
+     * @param {string} [json.id=""] 
+     * @param {string} [json.imageUrl=""] 
+     * @param {string} [json.name=""] 
+     * @param {string} [json.platform=""] 
+     * @param {QueryReleaseStatus} [json.releaseStatus=QueryReleaseStatus] 
+     * @param {any[]} [json.tags=[]] 
+     * @param {string} [json.unityPackageUrl=""] 
+     * @param {string} [json.unityVersion=""] 
+     * 
      * @returns {Promise<World>} Returns a single World object.
      */
-    async CreateWorld({ assetUrl = "", assetVersion = 0, authorId = "", authorName = "", capacity = 0, description = "", id = "", imageUrl = "", name = "", platform = "", releaseStatus = QueryReleaseStatus, tags = [], unityPackageUrl = "", unityVersion = "" } = {}) {
+    async CreateWorld({assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!assetUrl || !imageUrl || !name) return new Error("Required Argument(s): assetUrl, imageUrl, name", 400, {});
 
-        const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify({ assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion }), headers: this.#GenerateHeaders(true, "application/json") });
+        const args = {assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion};
+        let bodyJSON = {};
+        for(let i = 0; i < 7; i++) {
+            let key = Object.keys(args)[i];
+            if(args[key] !== undefined) bodyJSON[key] = args[key];
+        }
+
+        const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify(bodyJSON), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
