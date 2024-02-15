@@ -50,9 +50,25 @@ class WorldsApi {
      * 
      * Search and list any worlds by query filters.
      * 
+     * @param {Object} [json={}] 
+     * @param {boolean} [json.featured=false] 
+     * @param {QuerySort} [json.sort=QuerySort] 
+     * @param {boolean} [json.user=false] 
+     * @param {string} [json.userId=""] 
+     * @param {number} [json.n=60] 
+     * @param {QueryOrder} [json.order=QueryOrder] 
+     * @param {number} [json.offset=0] 
+     * @param {string} [json.search=""] 
+     * @param {string} [json.tag=""] 
+     * @param {string} [json.notag=""] 
+     * @param {QueryReleaseStatus} [json.releaseStatus=QueryReleaseStatus] 
+     * @param {string} [json.maxUnityVersion=""] 
+     * @param {string} [json.minUnityVersion=""] 
+     * @param {string} [json.platform=""] 
+     * 
      * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
-    async SearchAllWorlds({ featured = false, sort = QuerySort, user = false, userId = "", n = 60, order = QueryOrder, offset = 0, search = "", tag = "", notag = "", releaseStatus = QueryReleaseStatus, maxUnityVersion = "", minUnityVersion = "", platform = "" } = {}) {
+    async SearchAllWorlds({featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
