@@ -33,7 +33,7 @@ class Group {
         Object.keys(res).forEach(element => {
             this[element] = res[element];
         });
-    };
+    }
 }
 
 module.exports = { Group };

@@ -1,3 +1,5 @@
+const { Group } = require('../Group.js');
+const { LimitedGroup } = require('../LimitedGroup.js');
 const Util = require('../Util.js');
 
 class GroupsApi {
