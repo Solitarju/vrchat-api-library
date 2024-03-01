@@ -1,3 +1,4 @@
+const { GroupAnnouncement } = require('../GroupAnnouncement.js');
 const { Group } = require('../Group.js');
 const { LimitedGroup } = require('../LimitedGroup.js');
 const { Success } = require('../Success.js');
@@ -180,18 +181,21 @@ class GroupsApi {
 
     /**
      * 
-     * Returns the announcement for a Group. If no announcement has been made, then it returns **empty object**. If an announcement exists, then it will always return all fields except imageId and imageUrl which may be null.
+     * Returns the announcement for a Group. If no announcement has been made, then it returns **empty object**. If an announcement exists, then it will always return all fields except `imageId` and `imageUrl` which may be null.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId 
+     * 
+     * @returns {Promise<GroupAnnouncement>} Returns a single GroupAnnouncement object. 
      */
-    async GetGroupAnnouncement(groupId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async GetGroupAnnouncement(groupId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/announcement`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupAnnouncement(json);
     }
 
     /**
