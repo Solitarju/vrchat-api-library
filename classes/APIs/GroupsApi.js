@@ -114,16 +114,21 @@ class GroupsApi {
      * 
      * Returns a single Group by ID.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.groupId=""] 
+     * @param {boolean} [json.includeRoles=false] 
+     * 
+     * @returns {Promise<Group>} Returns a single Group object.
      */
-    async GetGroupById({ groupId = "", includeRoles = false } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async GetGroupById({groupId, includeRoles} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
-        const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}${this.#GenerateParameters(includeRoles)}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}${this.#GenerateParameters({includeRoles})}`, { headers: this.#GenerateHeaders(true) });
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Group(json);
     }
 
     /**
