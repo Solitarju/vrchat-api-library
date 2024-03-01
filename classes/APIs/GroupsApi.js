@@ -135,15 +135,27 @@ class GroupsApi {
      * 
      * Updates a Group and returns it.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.groupId=""] 
+     * @param {string} [json.name=""] 
+     * @param {string} [json.shortCode=""] 
+     * @param {string} [json.description=""] 
+     * @param {string} [json.joinState=""] 
+     * @param {string} [json.iconId=""] 
+     * @param {string} [json.bannerId=""] 
+     * @param {string} [json.privacy=""] 
+     * @param {string} [json.roleTemplate=""] 
+     * 
+     * @returns {Promise<Group>} Returns a single Group object.
      */
-    async UpdateGroup({ groupId = "", name = "", shortCode = "", description = "", joinState = "", iconId = "", bannerId = "", privacy = "", roleTemplate = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+    async UpdateGroup({groupId, name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}`, { method: 'PUT', body: this.#GenerateBody({ name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Group(json);
     }
 
     /**
