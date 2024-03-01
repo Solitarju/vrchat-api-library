@@ -58,6 +58,33 @@ class GroupsApi {
 
     /**
      * 
+     * Searches Groups by name or shortCode.
+     * 
+     * @param {Object} [json={}] 
+     * @param {string} [json.query=""] 
+     * @param {number} [json.offset=0] 
+     * @param {number} [json.n=60] 
+     * 
+     * @returns {Promise<Array<LimitedGroup>>} Returns an array of LimitedGroup objects.
+     * 
+     */
+    async SearchGroup({query, offset, n} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+
+        const res = await this.#fetch(`${this.#APIEndpoint}/groups${this.#GenerateParameters({query, offset, n})}`, { headers: this.#GenerateHeaders(true) });
+        const json = await res.json();
+
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new LimitedGroup(json[i]));
+        }
+        return returnArray;
+    }
+
+    /**
+     * 
      * Creates a Group and returns a Group object. **Requires VRC+ Subscription.**
      * 
      * @param {Object} [json={}] 
