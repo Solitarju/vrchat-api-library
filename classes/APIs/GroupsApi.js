@@ -1,5 +1,6 @@
 const { Group } = require('../Group.js');
 const { LimitedGroup } = require('../LimitedGroup.js');
+const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
@@ -162,16 +163,19 @@ class GroupsApi {
      * 
      * Deletes a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId 
+     * 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
-    async DeleteGroup(groupId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async DeleteGroup(groupId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
