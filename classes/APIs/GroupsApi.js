@@ -202,16 +202,24 @@ class GroupsApi {
      * 
      * Creates an Announcement for a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.groupId=""] 
+     * @param {string} [json.title=""] 
+     * @param {string} [json.text=""] 
+     * @param {string} [json.imageId=""] 
+     * @param {boolean} [json.sendNotification=false] 
+     * 
+     * @returns {Promise<GroupAnnouncement>} Returns a single GroupAnnouncement object. 
      */
-    async CreateGroupAnnouncement({ groupId = "", title = "", text = "", imageId = "", sendNotification = false } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !title) return { success: false, status: 400 };
+    async CreateGroupAnnouncement({groupId, title, text, imageId, sendNotification} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !title) return new Error("Required Argument(s): groupId, title", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/announcement`, { method: 'POST', body: this.#GenerateBody({ title, text, imageId, sendNotification }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupAnnouncement(json);
     }
 
     /**
