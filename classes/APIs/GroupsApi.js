@@ -2,6 +2,7 @@ const { Group } = require('../Group.js');
 const { LimitedGroup } = require('../LimitedGroup.js');
 const { GroupMember } = require('../GroupMember.js');
 const { GroupAnnouncement } = require('../GroupAnnouncement.js');
+const { GroupGallery } = require('../GroupGallery.js');
 const { GroupAudit } = require('../GroupAudit.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
@@ -338,16 +339,27 @@ class GroupsApi {
      * 
      * Creates a gallery for a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.name
+     * @param {string} [json.description=""] 
+     * @param {boolean} [json.membersOnly=false] 
+     * @param {string[]} [json.roleIdsToView=[]] 
+     * @param {string[]} [json.roleIdsToSubmit=[]] 
+     * @param {string[]} [json.roleIdsToAutoApprove=[]] 
+     * @param {string[]} [json.roleIdsToManage=[]] 
+     * 
+     * @returns {Promise<GroupGallery>} Returns a single GroupGallery object. 
      */
-    async CreateGroupGallery({ groupId = "", name = "", description = "", membersOnly = false, roleIdsToView = [], roleIdsToSubmit = [], roleIdsToAutoApprove = [], roleIdsToManage = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !name) return { success: false, status: 400 };
+    async CreateGroupGallery({groupId, name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !name) return new Error("Required Argument(s): groupId, name", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries`, { method: 'POST', body: this.#GenerateBody({ name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupGallery(json);
     }
 
     /**
