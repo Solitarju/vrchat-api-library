@@ -3,6 +3,7 @@ const { LimitedGroup } = require('../LimitedGroup.js');
 const { GroupMember } = require('../GroupMember.js');
 const { GroupAnnouncement } = require('../GroupAnnouncement.js');
 const { GroupGallery } = require('../GroupGallery.js');
+const { GroupGalleryImage } = require('../GroupGalleryImage.js');
 const { GroupAudit } = require('../GroupAudit.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
@@ -366,16 +367,29 @@ class GroupsApi {
      * 
      * Returns a list of images for a Group gallery.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.galleryId
+     * @param {number} [json.n=60] 
+     * @param {number} [json.offset=0] 
+     * @param {boolean} [json.approved=false] 
+     * 
+     * @returns {Promise<Array<GroupGalleryImage>>} Returns an Array of GroupGalleryImage objects. 
      */
-    async GetGroupGalleryImages({ groupId = "", galleryId = "", n = 60, offset = 0, approved = false }) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !galleryId) return { success: false, status: 400 };
+    async GetGroupGalleryImages({groupId, galleryId, n, offset, approved} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !galleryId) return new Error("Required Argument(s): groupId, galleryId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}${this.#GenerateParameters({ n, offset, approved })}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupGalleryImage(json[i]));
+        }
+        return returnArray;
     }
 
     /**
