@@ -1,7 +1,8 @@
-const { GroupAnnouncement } = require('../GroupAnnouncement.js');
-const { GroupAudit } = require('../GroupAudit.js');
 const { Group } = require('../Group.js');
 const { LimitedGroup } = require('../LimitedGroup.js');
+const { GroupMember } = require('../GroupMember.js');
+const { GroupAnnouncement } = require('../GroupAnnouncement.js');
+const { GroupAudit } = require('../GroupAudit.js');
 const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
@@ -270,16 +271,27 @@ class GroupsApi {
      * 
      * Returns a list of banned users for a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {number} [json.n=60] 
+     * @param {number} [json.offset=0] 
+     * 
+     * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects. 
      */
-    async GetGroupBans({ groupId = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async GetGroupBans({groupId, n, offset} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/bans${this.#GenerateParameters({ n, offset })}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupMember(json[i]));
+        }
+        return returnArray;
     }
 
     /**
