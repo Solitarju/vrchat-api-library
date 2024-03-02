@@ -318,16 +318,20 @@ class GroupsApi {
      * 
      * Unbans a user from a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId 
+     * @param {string} userId
+     * 
+     * @returns {Promise<GroupMember>} Returns a single GroupMember object. 
      */
-    async UnbanGroupMember(groupId = "", userId = "") { 
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId) return { success: false, status: 400 };
+    async UnbanGroupMember(groupId, userId) { 
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/bans/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupMember(json);
     }
 
     /**
