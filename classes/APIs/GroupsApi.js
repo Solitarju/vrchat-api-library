@@ -1,4 +1,5 @@
 const { GroupAnnouncement } = require('../GroupAnnouncement.js');
+const { GroupAudit } = require('../GroupAudit.js');
 const { Group } = require('../Group.js');
 const { LimitedGroup } = require('../LimitedGroup.js');
 const { Success } = require('../Success.js');
@@ -245,16 +246,24 @@ class GroupsApi {
      * 
      * Returns a list of audit logs for a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {number} [json.n=60] 
+     * @param {number} [json.offset=0] 
+     * @param {string} [json.startDate=""] 
+     * @param {string} [json.endDate=""] 
+     * 
+     * @returns {Promise<GroupAudit>} Returns a single GroupAudit object.
      */
-    async GetGroupAuditLogs({ groupId = "", n = 60, offset = 0, startDate = "", endDate = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async GetGroupAuditLogs({groupId, n, offset, startDate, endDate} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/auditLogs${this.#GenerateParameters({ n, offset, startDate, endDate })}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupAudit(json);
     }
 
     /**
