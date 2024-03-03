@@ -396,16 +396,28 @@ class GroupsApi {
      * 
      * Updates a gallery for a Group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.groupGalleryId
+     * @param {string} [json.name=""] 
+     * @param {string} [json.description=""] 
+     * @param {boolean} [json.membersOnly=false] 
+     * @param {any[]} [json.roleIdsToView=[]] 
+     * @param {any[]} [json.roleIdsToSubmit=[]] 
+     * @param {any[]} [json.roleIdsToAutoApprove=[]] 
+     * @param {any[]} [json.roleIdsToManage=[]] 
+     * 
+     * @returns {Promise<GroupGallery>} Returns a single GroupGallery object.
      */
-    async UpdateGroupGallery({ groupId = "", groupGalleryId = "", name = "", description = "", membersOnly = false, roleIdsToView = [], roleIdsToSubmit = [], roleIdsToAutoApprove = [], roleIdsToManage = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !groupGalleryId) return { success: false, status: 400 };
+    async UpdateGroupGallery({groupId, groupGalleryId, name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId) return new Error("Required Argument(s): groupId, groupGalleryId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}`, { method: 'PUT', body: this.#GenerateBody({ name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupGallery(json);
     }
 
     /**
