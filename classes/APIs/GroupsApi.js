@@ -465,16 +465,21 @@ class GroupsApi {
      * 
      * Deletes an image from a Group gallery.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * @param {string} groupGalleryId=
+     * @param {string} groupGalleryImageId
+     * 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
-    async DeleteGroupGalleryImage(groupId = "", groupGalleryId = "", groupGalleryImageId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !groupGalleryId || !groupGalleryImageId) return { success: false, status: 400 };
+    async DeleteGroupGalleryImage(groupId, groupGalleryId, groupGalleryImageId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId || !groupGalleryImageId) return new Error("Required Argument(s): groupId, groupGalleryId, groupGalleryImageId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}/images/${groupGalleryImageId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
