@@ -595,16 +595,27 @@ class GroupsApi {
      * 
      * Returns a List of all **other** Group Members. This endpoint will never return the user calling the endpoint. Information about the user calling the endpoint must be found in the myMember field of the Group object.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {number} [json.n=60] 
+     * @param {number} [json.offset=0] 
+     * 
+     * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
-    async ListGroupMembers({ groupId = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async ListGroupMembers({groupId, n, offset} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members${this.#GenerateParameters({ n, offset })}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupMember(json[i]));
+        }
+        return returnArray;
     }
 
     /**
