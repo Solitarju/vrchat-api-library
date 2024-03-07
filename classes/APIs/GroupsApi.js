@@ -797,16 +797,22 @@ class GroupsApi {
      * 
      * Responds to a Group Join Request with Accept/Deny
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [param0={}] 
+     * @param {string} param0.groupId
+     * @param {string} param0.userId
+     * @param {string} [param0.action=""] 
+     * 
+     * @returns {Promise<number>} Returns HTTP Status code.
      */
-    async RespondToGroupJoinRequest({ groupId = "", userId = "", action = "" }) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId) return { success: false, status: 400 };
+    async RespondToGroupJoinRequest({groupId, userId, action} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/requests/${userId}`, { method: 'PUT', body: this.#GenerateBody({ action }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
