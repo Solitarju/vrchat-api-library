@@ -708,16 +708,21 @@ class GroupsApi {
      * 
      * Removes a Role from a Group Member.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * @param {string} userId
+     * @param {string} groupRoleId
+     * 
+     * @returns {Promise<JSON>} Returns raw JSON, I don't have VRC+ so I'm unable to test these group-related features where the docs lack. If you can help with this, please contact me!
      */
-    async RemoveRoleFromGroupMember(groupId = "", userId = "", groupRoleId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId || !groupRoleId) return { success: false, status: 400 };
+    async RemoveRoleFromGroupMember(groupId, userId, groupRoleId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId || !groupRoleId) return new Error("Required Argument(s): groupId, userId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}/roles/${groupRoleId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return json;
     }
 
     /**
