@@ -643,16 +643,24 @@ class GroupsApi {
      * 
      * Updates a Group Member.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.userId
+     * @param {string} [json.visibility=""] 
+     * @param {boolean} [json.isSubscribedToAnnouncements=false] 
+     * @param {string} [json.managerNotes=""] 
+     * 
+     * @returns {Promise<LimitedGroupMember>} Might return a single LimitedGroupMember object. The community-driven VRC docs are broken and don't specify, if you have VRC+ and have the knowledge to pull the json response from this network request, please contact me.
      */
-    async UpdateGroupMember({ groupId = "", userId = "", visibility = "", isSubscribedToAnnouncements = false, managerNotes = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId) return { success: false, status: 400 };
+    async UpdateGroupMember({groupId, userId, visibility, isSubscribedToAnnouncements, managerNotes} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}`, { method: 'PUT', body: this.#GenerateBody({ visibility, isSubscribedToAnnouncements, managerNotes }),headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new LimitedGroupMember(json);
     }
 
     /**
