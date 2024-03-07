@@ -576,16 +576,19 @@ class GroupsApi {
      * 
      * Leave a group by ID.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * 
+     * @returns {Promise<number>} Returns HTTP Status code.
      */
-    async LeaveGroup(groupId = "") { 
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async LeaveGroup(groupId) { 
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/leave`, { method: 'POST', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
