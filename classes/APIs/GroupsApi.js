@@ -524,7 +524,7 @@ class GroupsApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites`, { method: 'POST', body: this.#GenerateBody({ userId, confirmOverrideBlock }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json?.error?.message ?? "", res.status, json ?? {});
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -544,7 +544,7 @@ class GroupsApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json?.error?.message ?? "", res.status, json ?? {});
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -552,16 +552,24 @@ class GroupsApi {
      * 
      * Join a Group by ID and returns the member object.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * 
+     * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
-    async JoinGroup(groupId = "") { 
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async JoinGroup(groupId) { 
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/join`, { method: 'POST', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupMember(json[i]));
+        }
+        return returnArray;
     }
 
     /**
