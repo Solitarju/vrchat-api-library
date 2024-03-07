@@ -532,16 +532,20 @@ class GroupsApi {
      * 
      * Deletes an Group invite sent to a User.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * @param {string} userId
+     * 
+     * @returns {Promise<number>} Returns HTTP Status code.
      */
-    async DeleteUserInvite(groupId = "", userId = "") { 
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId) return { success: false, status: 400 };
+    async DeleteUserInvite(groupId, userId) { 
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json?.error?.message ?? "", res.status, json ?? {});
+        return res.status;
     }
 
     /**
