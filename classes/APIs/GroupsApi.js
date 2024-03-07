@@ -510,16 +510,22 @@ class GroupsApi {
      * 
      * Sends an invite to a user to join the group.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.userId
+     * @param {boolean} [json.confirmOverrideBlock=true] 
+     * 
+     * @returns {Promise<number>} Returns HTTP Status code.
      */
-    async InviteUserToGroup({ groupId = "", userId = "", confirmOverrideBlock = true } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !userId) return { success: false, status: 400 };
+    async InviteUserToGroup({groupId, userId, confirmOverrideBlock} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites`, { method: 'POST', body: this.#GenerateBody({ userId, confirmOverrideBlock }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json?.error?.message ?? "", res.status, json ?? {});
+        return res.status;
     }
 
     /**
