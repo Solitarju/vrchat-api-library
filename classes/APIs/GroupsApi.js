@@ -900,16 +900,25 @@ class GroupsApi {
      * 
      * Deletes a Group Role by ID and returns the remaining roles.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * @param {string} groupRoleId
+     * 
+     * @returns {Promise<Array<GroupRole>>} Returns array of GroupRole objects.
      */
-    async DeleteGroupRole(groupId = "", groupRoleId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !groupRoleId) return { success: false, status: 400 };
+    async DeleteGroupRole(groupId, groupRoleId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupRoleId) return new Error("Required Argument(s): groupId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles/${groupRoleId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupRole(json[i]));
+        }
+        return returnArray;
     }
 
 }
