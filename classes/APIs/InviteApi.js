@@ -106,16 +106,20 @@ class InviteApi {
      * 
      * Respond to an invite request by sending a world invite to the requesting user. :notificationId is the ID of the requesting notification.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} notificationId
+     * @param {number} [responseSlot=0] 
+     * 
+     * @returns {Promise<Notification>} Returns a single Notification object.
      */
-    async RespondInvite(notificationId = "", responseSlot = 0) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!notificationId) return { success: false, status: 400 };
+    async RespondInvite(notificationId, responseSlot) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!notificationId) return new Error("Required Argument(s): notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/${notificationId}/response`, { method: 'POST', body: JSON.stringify({ responseSlot }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Notification(json);
     }
 
     /**
