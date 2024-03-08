@@ -215,16 +215,29 @@ class InviteApi {
      * 
      * See messageTypes here https://vrchatapi.github.io/docs/api/#put-/message/-userId-/-messageType-/-slot-.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.userId=""] - Defaults to currently authenticated user's id.
+     * @param {string} json.messageType
+     * @param {number} json.slot
+     * 
+     * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
-    async ResetInviteMessage({ userId = "", messageType = "message", slot = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+    async ResetInviteMessage({userId, messageType, slot} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!userId) userId = this.#userid;
+        if(!messageType) messageType = "message";
+        if(!slot) slot = 0;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new InviteMessage(json[i]));
+        }
+        return returnArray;
     }
 }
 
