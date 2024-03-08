@@ -1,5 +1,6 @@
 const { Notification } = require('../Notification.js');
 const { SentNotification } = require('../SentNotification.js');
+const { InviteMessage } = require('../InviteMessage.js');
 const { Error } = require('../Error.js');
 
 class InviteApi {
@@ -128,16 +129,25 @@ class InviteApi {
      * 
      * See messageTypes here https://vrchatapi.github.io/docs/api/#get-/message/-userId-/-messageType-.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} [userId=this.#userid] - Defaults to currently authenticated user's id.
+     * @param {string} [messageType="message"] 
+     * 
+     * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
-    async ListInviteMessages(userId = "", messageType = "message") {
-        if(!this.#authCookie) return { success: false, status: 401 };
+    async ListInviteMessages(userId, messageType) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!userId) userId = this.#userid;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new InviteMessage(json[i]));
+        }
+        return returnArray;
     }
 
     /**
