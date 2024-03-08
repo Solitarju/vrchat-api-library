@@ -3,6 +3,7 @@ const { LimitedGroup } = require('../LimitedGroup.js');
 const { LimitedGroupMember } = require('../LimitedGroupMember.js');
 const { GroupPermission } = require('../GroupPermission.js');
 const { GroupMember } = require('../GroupMember.js');
+const { GroupRole } = require('../GroupRole.js');
 const { GroupAnnouncement } = require('../GroupAnnouncement.js');
 const { GroupGallery } = require('../GroupGallery.js');
 const { GroupGalleryImage } = require('../GroupGalleryImage.js');
@@ -819,16 +820,24 @@ class GroupsApi {
      * 
      * Returns a Group Role by ID.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} groupId
+     * 
+     * @returns {Promise<Array<GroupRole>>} Returns an array of GroupRole objects.
      */
-    async GetGroupRoles(groupId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async GetGroupRoles(groupId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupRole(json[i]));
+        }
+        return returnArray;
     }
 
     /**
