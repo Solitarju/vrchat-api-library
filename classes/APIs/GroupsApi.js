@@ -97,14 +97,14 @@ class GroupsApi {
      * Creates a Group and returns a Group object. **Requires VRC+ Subscription.**
      * 
      * @param {Object} [json={}] 
-     * @param {string} [json.name=""] 
-     * @param {string} [json.shortCode=""] 
+     * @param {string} json.name
+     * @param {string} json.shortCode
      * @param {string} [json.description=""] 
      * @param {string} [json.joinState=""] 
      * @param {string} [json.iconId=""] 
      * @param {string} [json.bannerId=""] 
      * @param {string} [json.privacy=""] 
-     * @param {string} [json.roleTemplate=""] 
+     * @param {string} json.roleTemplate
      * 
      * @returns {Promise<Group>} Returns a single Group object.
      */
@@ -124,7 +124,7 @@ class GroupsApi {
      * Returns a single Group by ID.
      * 
      * @param {Object} [json={}] 
-     * @param {string} [json.groupId=""] 
+     * @param {string} json.groupId
      * @param {boolean} [json.includeRoles=false] 
      * 
      * @returns {Promise<Group>} Returns a single Group object.
@@ -145,7 +145,7 @@ class GroupsApi {
      * Updates a Group and returns it.
      * 
      * @param {Object} [json={}] 
-     * @param {string} [json.groupId=""] 
+     * @param {string} json.groupId
      * @param {string} [json.name=""] 
      * @param {string} [json.shortCode=""] 
      * @param {string} [json.description=""] 
@@ -159,6 +159,7 @@ class GroupsApi {
      */
     async UpdateGroup({groupId, name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}`, { method: 'PUT', body: this.#GenerateBody({ name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -210,8 +211,8 @@ class GroupsApi {
      * Creates an Announcement for a Group.
      * 
      * @param {Object} [json={}] 
-     * @param {string} [json.groupId=""] 
-     * @param {string} [json.title=""] 
+     * @param {string} json.groupId
+     * @param {string} json.title
      * @param {string} [json.text=""] 
      * @param {string} [json.imageId=""] 
      * @param {boolean} [json.sendNotification=false] 
@@ -469,7 +470,7 @@ class GroupsApi {
      * Deletes an image from a Group gallery.
      * 
      * @param {string} groupId
-     * @param {string} groupGalleryId=
+     * @param {string} groupGalleryId
      * @param {string} groupGalleryImageId
      * 
      * @returns {Promise<Success>} Returns a single Success object.
@@ -798,10 +799,10 @@ class GroupsApi {
      * 
      * Responds to a Group Join Request with Accept/Deny
      * 
-     * @param {Object} [param0={}] 
-     * @param {string} param0.groupId
-     * @param {string} param0.userId
-     * @param {string} [param0.action=""] 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.userId
+     * @param {string} [json.action=""] 
      * 
      * @returns {Promise<number>} Returns HTTP Status code.
      */
