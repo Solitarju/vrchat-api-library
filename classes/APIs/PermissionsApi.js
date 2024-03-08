@@ -64,16 +64,19 @@ class PermissionsApi {
      * 
      * Returns a single permission. This endpoint is pretty useless, as it returns the exact same information as /auth/permissions.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} permissionId
+     * 
+     * @returns {Promise<Permission>} Returns a single Permission object.
      */
-    async GetPermission(permissionId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!permissionId) return { success: false, status: 400 };
+    async GetPermission(permissionId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!permissionId) return new Error("Required Argument(s): permissionId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/permissions/${permissionId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Permission(json);
     }
 
 }
