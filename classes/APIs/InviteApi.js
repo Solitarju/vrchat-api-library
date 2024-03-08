@@ -182,17 +182,29 @@ class InviteApi {
      * 
      * See messageTypes here https://vrchatapi.github.io/docs/api/#put-/message/-userId-/-messageType-/-slot-.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.userId=""] - Defaults to currently authenticated user's id.
+     * @param {string} [json.messageType="message"] 
+     * @param {number} [json.slot=0] 
+     * @param {string} json.message
+     * 
+     * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
-    async UpdateInviteMessage({ userId = "", messageType = "message", slot = 0, message = ""} = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!message) return { success: false, status: 400 };
+    async UpdateInviteMessage({userId, messageType, slot, message} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!message) message = "";
         if(!userId) userId = this.#userid;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'PUT', body: JSON.stringify({ message }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new InviteMessage(json[i]));
+        }
+        return returnArray;
     }
 
     /**
