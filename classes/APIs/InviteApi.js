@@ -156,16 +156,22 @@ class InviteApi {
      * 
      * See messageTypes here https://vrchatapi.github.io/docs/api/#get-/message/-userId-/-messageType-/-slot-.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} [json.userId=this.#userid] - Defaults to currently authenticated user's id.
+     * @param {string} [json.messageType="message"] 
+     * @param {number} [json.slot=0] 
+     * 
+     * @returns {Promise<InviteMessage>} Returns a single InviteMessage object.
      */
-    async GetInviteMessage({ userId = "", messageType = "message", slot = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+    async GetInviteMessage({userId, messageType, slot} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!userId) userId = this.#userid;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new InviteMessage(json);
     }
 
     /**
