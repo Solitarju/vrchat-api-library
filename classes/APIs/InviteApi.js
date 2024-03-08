@@ -1,3 +1,6 @@
+const { SentNotification } = require('../SentNotification.js');
+const { Error } = require('../Error.js');
+
 class InviteApi {
 
     #fetch;
@@ -38,18 +41,24 @@ class InviteApi {
 
     /**
      * 
-     * Sends an invite to a user. Returns the Notification of type invite that was sent.
+     * Sends an invite to a user. Returns the Notification of type `invite` that was sent.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.userId
+     * @param {string} json.instanceId
+     * @param {number} [json.messageSlot=0] 
+     * 
+     * @returns {Promise<SentNotification>} Returns a single SentNotification object.
      */
-    async InviteUser({ userId = "", instanceId = "", messageSlot = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!userId || !instanceId) return { success: false, status: 400 };
+    async InviteUser({userId, instanceId, messageSlot} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!userId || !instanceId) return new Error("Required Argument(s): userId, instanceId", 400, {});
 
         const res = await this.#fetch(`$${this.#APIEndpoint}/invite/${userId}`, { method: 'POST', body: JSON.stringify({ instanceId, messageSlot }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new SentNotification(json);
     }
 
     /**
