@@ -869,16 +869,31 @@ class GroupsApi {
      * 
      * Updates a group role by ID.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} json.groupRoleId
+     * @param {string} [json.name=""] 
+     * @param {string} [json.description=""] 
+     * @param {boolean} [json.isSelfAssignable=false] 
+     * @param {any[]} [json.permissions=[]] 
+     * @param {number} [json.order=0] 
+     * 
+     * @returns {Promise<Array<GroupRole>>} Returns an array of GroupRole objects.
      */
-    async UpdateGroupRole({ groupId = "", groupRoleId = "", name = "", description = "", isSelfAssignable = false, permissions = [], order = 0 } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId || !groupRoleId) return { success: false, status: 400 };
+    async UpdateGroupRole({groupId, groupRoleId, name, description, isSelfAssignable, permissions, order} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupRoleId) return new Error("Required Argument(s): groupId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles/${groupRoleId}`, { method: 'PUT', body: this.#GenerateBody({ name, description, isSelfAssignable, permissions, order }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new GroupRole(json[i]));
+        }
+        return returnArray;
     }
 
     /**
