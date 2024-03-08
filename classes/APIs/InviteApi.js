@@ -130,13 +130,14 @@ class InviteApi {
      * See messageTypes here https://vrchatapi.github.io/docs/api/#get-/message/-userId-/-messageType-.
      * 
      * @param {string} [userId=this.#userid] - Defaults to currently authenticated user's id.
-     * @param {string} [messageType="message"] 
+     * @param {string} messageType
      * 
      * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
     async ListInviteMessages(userId, messageType) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         if(!userId) userId = this.#userid;
+        if(!messageType) messageType = "message";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -158,14 +159,16 @@ class InviteApi {
      * 
      * @param {Object} [json={}] 
      * @param {string} [json.userId=this.#userid] - Defaults to currently authenticated user's id.
-     * @param {string} [json.messageType="message"] 
-     * @param {number} [json.slot=0] 
+     * @param {string} json.messageType
+     * @param {number} json.slot
      * 
      * @returns {Promise<InviteMessage>} Returns a single InviteMessage object.
      */
     async GetInviteMessage({userId, messageType, slot} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!slot) return new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
+        if(!messageType) messageType = "message";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
@@ -184,16 +187,18 @@ class InviteApi {
      * 
      * @param {Object} [json={}] 
      * @param {string} [json.userId=""] - Defaults to currently authenticated user's id.
-     * @param {string} [json.messageType="message"] 
-     * @param {number} [json.slot=0] 
+     * @param {string} json.messageType
+     * @param {number} json.slot
      * @param {string} json.message
      * 
      * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
     async UpdateInviteMessage({userId, messageType, slot, message} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!message) message = "";
+        if(!slot) return new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
+        if(!messageType) messageType = "message";
+        if(!message) message = "";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'PUT', body: JSON.stringify({ message }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
@@ -224,9 +229,9 @@ class InviteApi {
      */
     async ResetInviteMessage({userId, messageType, slot} = {}) {
         if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!slot) return new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
         if(!messageType) messageType = "message";
-        if(!slot) slot = 0;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
