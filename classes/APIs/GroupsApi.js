@@ -844,16 +844,25 @@ class GroupsApi {
      * 
      * Create a Group role.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {Object} [json={}] 
+     * @param {string} json.groupId
+     * @param {string} [json.id=""] 
+     * @param {string} [json.name=""] 
+     * @param {string} [json.description=""] 
+     * @param {boolean} [json.isSelfAssignable=false] 
+     * @param {any[]} [json.permissions=[]] 
+     * 
+     * @returns {Promise<GroupRole>} Returns a single GroupRole object.
      */
-    async CreateGroupRole({ groupId = "", id = "", name = "", description = "", isSelfAssignable = false, permissions = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!groupId) return { success: false, status: 400 };
+    async CreateGroupRole({groupId, id, name, description, isSelfAssignable, permissions} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles`, { method: 'POST', body: this.#GenerateBody({ id, name, description, isSelfAssignable, permissions }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new GroupRole(json);
     }
 
     /**
