@@ -65,16 +65,20 @@ class InviteApi {
      * 
      * Sends self an invite to an instance.
      * 
-     * @returns {Promise<JSON>} 
+     * @param {string} worldId
+     * @param {string} instanceId
+     * 
+     * @returns {Promise<SentNotification>} Returns a single SentNotification object.
      */
-    async InviteMyselfToInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };  
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+    async InviteMyselfToInstance(worldId, instanceId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!userId || !instanceId) return new Error("Required Argument(s): userId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true, "application/json") }); // No body data so I don't know why I'm using application/json but the docs specify it.
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new SentNotification(json);
     }
 
     /**
