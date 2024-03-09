@@ -1,3 +1,5 @@
+const { PlayerModeration } = require('../PlayerModeration.js');
+const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
 class PlayerModerationApi {
@@ -46,16 +48,27 @@ class PlayerModerationApi {
      * Returns a list of all player moderations made by **you**.  
      * 
      * This endpoint does not have pagination, and will return ***all*** results. Use query parameters to limit your query if needed.
-     * @returns {Promise<JSON>}
+     * 
+     * @param {Object} [json={}] 
+     * @param {string} [json.type=""] 
+     * @param {string} [json.targetUserId=""] 
+     * 
+     * @returns {Promise<Array<PlayerModeration>>} Returns an array of PlayerModeration objects.
      */
-    async SearchPlayerModerations({ type = "", targetUserId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+    async SearchPlayerModerations({type, targetUserId} = {}) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ type, targetUserId });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
 
-        return { success: true, res: await res.json() };
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new PlayerModeration(json[i]));
+        }
+        return returnArray;
     }
 
     /**
