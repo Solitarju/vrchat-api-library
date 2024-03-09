@@ -114,16 +114,19 @@ class PlayerModerationApi {
      * 
      * Returns a single Player Moderation. This returns the exact same amount of information as the more generalised getPlayerModerations.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} playerModerationId
+     * 
+     * @returns {Promise<PlayerModeration>} Returns a single PlayerModeration object.
      */
-    async GetPlayerModeration(playerModerationId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!playerModerationId) return { success: false, status: 400 };
+    async GetPlayerModeration(playerModerationId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!playerModerationId) return new Error("Required Argument(s): playerModerationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations/${playerModerationId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new PlayerModeration(json);
     }
 
     /**
