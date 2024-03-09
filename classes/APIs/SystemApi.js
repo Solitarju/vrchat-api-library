@@ -1,3 +1,5 @@
+const { APIConfig } = require('../APIConfig.js');
+const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
 class SystemApi {
@@ -14,14 +16,14 @@ class SystemApi {
      * 
      * API config contains configuration that the clients needs to work properly.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<APIConfig>} Returns a single APIConfig object.
      */
     async FetchAPIConfig() {
-
         const res = await fetch(`${this.#APIEndpoint}/config`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, {});
+        return new APIConfig(json);
     }
 
     /**
