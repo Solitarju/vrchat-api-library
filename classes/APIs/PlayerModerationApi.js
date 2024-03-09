@@ -1,4 +1,5 @@
 const { PlayerModeration } = require('../PlayerModeration.js');
+const { Success } = require('../Success.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
@@ -97,15 +98,16 @@ class PlayerModerationApi {
      * 
      * **This will delete every single player moderation you've ever made.**
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async ClearAllPlayerModerations() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
