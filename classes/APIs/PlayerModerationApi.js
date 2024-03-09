@@ -152,16 +152,20 @@ class PlayerModerationApi {
      * 
      * Removes a player moderation previously added through moderateUser. E.g if you previously have shown their avatar, but now want to reset it to default.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} moderated
+     * @param {string} type
+     * 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
-    async UnModerateUser(moderated = "", type = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!moderated || !type) return { success: false, status: 400 };
+    async UnModerateUser(moderated, type) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!moderated || !type) return new Error("Required Argument(s): moderated, type", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/unplayermoderate`, { method: 'PUT', body: JSON.stringify({ moderated, type }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
 }
