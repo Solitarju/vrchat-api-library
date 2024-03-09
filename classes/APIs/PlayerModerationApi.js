@@ -133,16 +133,19 @@ class PlayerModerationApi {
      * 
      * Deletes a specific player moderation based on it's pmod_ ID. The website uses unmoderateUser instead. You can delete the same player moderation multiple times successfully.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} playerModerationId
+     * 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
-    async DeletePlayerModeration(playerModerationId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!playerModerationId) return { success: false, status: 400 };
+    async DeletePlayerModeration(playerModerationId) {
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!playerModerationId) return new Error("Required Argument(s): playerModerationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations/${playerModerationId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
-
-        return { success: true, res: await res.json() };
+        const json = await res.json();
+        
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
