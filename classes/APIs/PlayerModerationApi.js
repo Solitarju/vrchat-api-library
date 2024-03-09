@@ -46,6 +46,8 @@ class PlayerModerationApi {
 
     /**
      * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
+     * 
      * Returns a list of all player moderations made by **you**.  
      * 
      * This endpoint does not have pagination, and will return ***all*** results. Use query parameters to limit your query if needed.
@@ -74,6 +76,8 @@ class PlayerModerationApi {
 
     /**
      * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
+     * 
      * Moderate a user, e.g. unmute them or show their avatar.  
      * 
      * Please see the [Player Moderation docs](https://vrchatapi.github.io/docs/api/#tag--playermoderation) on what playerModerations are, and how they differ from staff moderations.
@@ -96,6 +100,8 @@ class PlayerModerationApi {
 
     /**
      * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
+     * 
      * **This will delete every single player moderation you've ever made.**
      * 
      * @returns {Promise<Success>} Returns a single Success object.
@@ -111,6 +117,8 @@ class PlayerModerationApi {
     }
 
     /**
+     * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
      * 
      * Returns a single Player Moderation. This returns the exact same amount of information as the more generalised getPlayerModerations.
      * 
@@ -131,6 +139,8 @@ class PlayerModerationApi {
 
     /**
      * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
+     * 
      * Deletes a specific player moderation based on it's pmod_ ID. The website uses unmoderateUser instead. You can delete the same player moderation multiple times successfully.
      * 
      * @param {string} playerModerationId
@@ -149,6 +159,8 @@ class PlayerModerationApi {
     }
 
     /**
+     * 
+     * **Please read the [Player Moderation Implementation Details](https://vrchatapi.github.io/docs/api/#tag--playermoderation--implementation-details) before modifying player moderations!**
      * 
      * Removes a player moderation previously added through moderateUser. E.g if you previously have shown their avatar, but now want to reset it to default.
      * 
