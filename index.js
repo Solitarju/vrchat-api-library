@@ -58,7 +58,7 @@ class VRChat {
     NotificationsApi = new NotificationsApi({}, fetch, UserAgent);
     PermissionsApi = new PermissionsApi({}, fetch, UserAgent);
     PlayerModerationApi = new PlayerModerationApi({}, fetch, UserAgent);
-    SystemApi = new SystemApi({}, fetch, UserAgent);
+    SystemApi = new SystemApi(fetch, UserAgent);
     UsersApi = new UsersApi({}, fetch, UserAgent);
     WorldsApi = new WorldsApi({}, fetch, UserAgent);
 
@@ -147,6 +147,7 @@ class VRChat {
         this.NotificationsApi = new NotificationsApi(objJson, fetch, UserAgent);
         this.PermissionsApi = new PermissionsApi(objJson, fetch, UserAgent);
         this.PlayerModerationApi = new PlayerModerationApi(objJson, fetch, UserAgent);
+        this.SystemApi = new SystemApi(fetch, UserAgent);
         this.UsersApi = new UsersApi(objJson, fetch, UserAgent);
         this.WorldsApi = new WorldsApi(objJson, fetch, UserAgent);
 
@@ -179,6 +180,7 @@ class VRChat {
         this.NotificationsApi = new NotificationsApi();
         this.PermissionsApi = new PermissionsApi();
         this.PlayerModerationApi = new PlayerModerationApi();
+        this.SystemApi = new SystemApi();
         this.UsersApi = new UsersApi();
         this.WorldsApi = new WorldsApi();
 

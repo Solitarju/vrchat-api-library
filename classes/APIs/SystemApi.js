@@ -7,10 +7,27 @@ class SystemApi {
 
     #APIEndpoint = "https://api.vrchat.cloud/api/1";
 
+    #fetch;
+    #UserAgent;
+    #authCookie;
+    #twoFactorAuth;
+
     #GenerateParameters;
 
-    constructor() {
+    constructor(fetch, UserAgent) {
+        this.#fetch = fetch;
+        this.#UserAgent = UserAgent;
         this.#GenerateParameters = Util.GenerateParameters;
+    }
+
+    #GenerateHeaders(authentication = false, contentType = "") {
+        var headers = new this.#fetch.Headers({
+            "User-Agent": this.#UserAgent,
+            "cookie": `${this.#authCookie && authentication ? "auth=" + this.#authCookie + "; " : ""}${this.#twoFactorAuth && authentication ? "twoFactorAuth=" + this.#twoFactorAuth + "; " : ""}`
+        });
+
+        if(contentType) headers.set('Content-Type', contentType);
+        return headers;
     }
 
     /**
@@ -20,7 +37,7 @@ class SystemApi {
      * @returns {Promise<APIConfig>} Returns a single APIConfig object.
      */
     async FetchAPIConfig() {
-        const res = await fetch(`${this.#APIEndpoint}/config`);
+        const res = await this.#fetch(`${this.#APIEndpoint}/config`, { headers: this.#GenerateHeaders() });
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, {});
@@ -44,7 +61,7 @@ class SystemApi {
      */
     async ShowInformationNotices({require, include} = {}) {
         const params = this.#GenerateParameters({ require, include });
-        const res = await fetch(`${this.#APIEndpoint}/infoPush${params ? "?" + params : ""}`);
+        const res = await this.#fetch(`${this.#APIEndpoint}/infoPush${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
         const json = await res.json();
 
         if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
@@ -67,12 +84,12 @@ class SystemApi {
      */
     async DownloadCSS(variant, branch) {
         const params = this.#GenerateParameters({ variant, branch });
-        const res = await fetch(`${this.#APIEndpoint}/css/app.css${params ? "?" + params : ""}`);
-        const json = await res.json();
+        const res = await this.#fetch(`${this.#APIEndpoint}/css/app.css${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
+        const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
 
-        return json;
+        return content ?? "";
     }
 
     /**
@@ -86,12 +103,12 @@ class SystemApi {
      */
     async DownloadJavaScript(variant, branch) {
         const params = this.#GenerateParameters({ variant, branch });
-        const res = await fetch(`${this.#APIEndpoint}/js/app.js${params ? "?" + params : ""}`);
-        const json = await res.json();
+        const res = await this.#fetch(`${this.#APIEndpoint}/js/app.js${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
+        const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
 
-        return res.json();
+        return content ?? "";
     }
 
     /**
@@ -101,12 +118,12 @@ class SystemApi {
      * @returns {Promise<number>} Returns the number of current online users.
      */
     async CurrentOnlineUsers() {
-        const res = await fetch(`${this.#APIEndpoint}/visits`);
-        const json = await res.json();
+        const res = await this.#fetch(`${this.#APIEndpoint}/visits`, { headers: this.#GenerateHeaders() });
+        const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
 
-        return json;
+        return content ?? "";
     }
 
     /**
@@ -116,12 +133,12 @@ class SystemApi {
      * @returns {Promise<string>} Returns the server-side time as a string.
      */
     async CurrentSystemTime() {
-        const res = await fetch(`${this.#APIEndpoint}/time`);
-        const json = await res.json();
+        const res = await fetch(`${this.#APIEndpoint}/time`, { headers: this.#GenerateHeaders() });
+        const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
 
-        return json;
+        return content ?? "";
     }
 }
 
