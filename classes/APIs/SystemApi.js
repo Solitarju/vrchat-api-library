@@ -1,4 +1,5 @@
 const { APIConfig } = require('../APIConfig.js');
+const { InfoPush } = require('../InfoPush.js');
 const { Error } = require('../Error.js');
 const Util = require('../Util.js');
 
@@ -30,20 +31,29 @@ class SystemApi {
      * **EARLY ACCESS**
      * 
      * IPS (Info Push System) is a system for VRChat to push out dynamic information to the client. This is primarily used by the Quick-Menu info banners, but can also be used to e.g. alert you to update your game to the latest version.  
-
-     * include is used to query what Information Pushes should be included in the response. If include is missing or empty, then no notices will normally be returned. This is an "any of" search.  
-
-     * require is used to limit what Information Pushes should be included in the response. This is usually used in combination with include, and is an "all of" search.
      * 
-     * @returns {Promise<JSON>}
+     * `include` is used to query what Information Pushes should be included in the response. If include is missing or empty, then no notices will normally be returned. This is an "any of" search.  
+     * 
+     * `require` is used to limit what Information Pushes should be included in the response. This is usually used in combination with `include`, and is an "all of" search.
+     * 
+     * @param {Object} [json={}] 
+     * @param {string} [json.require=""] 
+     * @param {string} [json.include=""] 
+     * 
+     * @returns {Promise<Array<InfoPush>>} Returns an array of InfoPush objects.
      */
-    async ShowInformationNotices({ require = "", include = "" } = {}) {
-
+    async ShowInformationNotices({require, include} = {}) {
         const params = this.#GenerateParameters({ require, include });
         const res = await fetch(`${this.#APIEndpoint}/infoPush${params ? "?" + params : ""}`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new InfoPush(json[i]));
+        }
+        return returnArray;
     }
 
     /**
