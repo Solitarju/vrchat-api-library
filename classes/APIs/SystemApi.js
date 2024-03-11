@@ -60,15 +60,19 @@ class SystemApi {
      * 
      * Fetches the CSS code to the frontend React website.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} [variant="public"] 
+     * @param {string} [branch="main"] 
+     * 
+     * @returns {Promise<string>} Returns CSS as a string.
      */
-    async DownloadCSS(variant = "public", branch = "main") {
-
+    async DownloadCSS(variant, branch) {
         const params = this.#GenerateParameters({ variant, branch });
         const res = await fetch(`${this.#APIEndpoint}/css/app.css${params ? "?" + params : ""}`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: { css: await res.json() } };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        return json;
     }
 
     /**
