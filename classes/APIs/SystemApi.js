@@ -79,43 +79,49 @@ class SystemApi {
      * 
      * Fetches the JavaScript code to the frontend React website.
      * 
-     * @returns {Promise<JSON>}
+     * @param {string} [variant="public"] 
+     * @param {string} [branch="main"] 
+     * 
+     * @returns {Promise<string>} Returns JavaScript from the VRChat website's frontend as a string.
      */
-    async DownloadJavaScript(variant = "public", branch = "main") {
-
+    async DownloadJavaScript(variant, branch) {
         const params = this.#GenerateParameters({ variant, branch });
         const res = await fetch(`${this.#APIEndpoint}/js/app.js${params ? "?" + params : ""}`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: { javascript: await res.json().toString() } };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        return res.json();
     }
 
     /**
      * 
      * Returns the current number of online users.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<number>} Returns the number of current online users.
      */
     async CurrentOnlineUsers() {
-
         const res = await fetch(`${this.#APIEndpoint}/visits`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: { users: await res.json() } };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        return json;
     }
 
     /**
      * 
      * Returns the current time of the API server.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<string>} Returns the server-side time as a string.
      */
     async CurrentSystemTime() {
-
         const res = await fetch(`${this.#APIEndpoint}/time`);
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: { time: await res.json() } };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        return json;
     }
 }
 
