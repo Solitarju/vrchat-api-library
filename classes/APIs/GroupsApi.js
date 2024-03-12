@@ -78,12 +78,12 @@ class GroupsApi {
      * 
      */
     async SearchGroup({query, offset, n} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups${this.#GenerateParameters({query, offset, n})}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -109,13 +109,13 @@ class GroupsApi {
      * @returns {Promise<Group>} Returns a single Group object.
      */
     async CreateGroup({name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!name || !shortCode || !roleTemplate) return new Error("Required Argument(s): name, shortCode, roleTemplate", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!name || !shortCode || !roleTemplate) throw new Error("Required Argument(s): name, shortCode, roleTemplate", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups`, { method: 'POST', body: this.#GenerateBody({ name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Group(json);
     }
 
@@ -130,13 +130,13 @@ class GroupsApi {
      * @returns {Promise<Group>} Returns a single Group object.
      */
     async GetGroupById({groupId, includeRoles} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}${this.#GenerateParameters({includeRoles})}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Group(json);
     }
 
@@ -158,13 +158,13 @@ class GroupsApi {
      * @returns {Promise<Group>} Returns a single Group object.
      */
     async UpdateGroup({groupId, name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}`, { method: 'PUT', body: this.#GenerateBody({ name, shortCode, description, joinState, iconId, bannerId, privacy, roleTemplate }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Group(json);
     }
 
@@ -177,13 +177,13 @@ class GroupsApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteGroup(groupId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -196,13 +196,13 @@ class GroupsApi {
      * @returns {Promise<GroupAnnouncement>} Returns a single GroupAnnouncement object. 
      */
     async GetGroupAnnouncement(groupId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/announcement`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupAnnouncement(json);
     }
 
@@ -220,13 +220,13 @@ class GroupsApi {
      * @returns {Promise<GroupAnnouncement>} Returns a single GroupAnnouncement object. 
      */
     async CreateGroupAnnouncement({groupId, title, text, imageId, sendNotification} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !title) return new Error("Required Argument(s): groupId, title", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !title) throw new Error("Required Argument(s): groupId, title", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/announcement`, { method: 'POST', body: this.#GenerateBody({ title, text, imageId, sendNotification }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupAnnouncement(json);
     }
 
@@ -239,13 +239,13 @@ class GroupsApi {
      * @returns {Promise<Success>} Returns a single Success object. 
      */
     async DeleteGroupAnnouncement(groupId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/announcement`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -263,13 +263,13 @@ class GroupsApi {
      * @returns {Promise<GroupAudit>} Returns a single GroupAudit object.
      */
     async GetGroupAuditLogs({groupId, n, offset, startDate, endDate} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/auditLogs${this.#GenerateParameters({ n, offset, startDate, endDate })}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupAudit(json);
     }
 
@@ -285,13 +285,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects. 
      */
     async GetGroupBans({groupId, n, offset} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/bans${this.#GenerateParameters({ n, offset })}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -310,13 +310,13 @@ class GroupsApi {
      * @returns {Promise<GroupMember>} Returns a single GroupMember object.
      */
     async BanGroupMember(groupId, userId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/bans`, { method: 'POST', body: this.#GenerateBody({ userId }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupMember(json);
     }
 
@@ -330,13 +330,13 @@ class GroupsApi {
      * @returns {Promise<GroupMember>} Returns a single GroupMember object. 
      */
     async UnbanGroupMember(groupId, userId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/bans/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupMember(json);
     }
 
@@ -357,13 +357,13 @@ class GroupsApi {
      * @returns {Promise<GroupGallery>} Returns a single GroupGallery object. 
      */
     async CreateGroupGallery({groupId, name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !name) return new Error("Required Argument(s): groupId, name", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !name) throw new Error("Required Argument(s): groupId, name", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries`, { method: 'POST', body: this.#GenerateBody({ name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupGallery(json);
     }
 
@@ -381,13 +381,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupGalleryImage>>} Returns an Array of GroupGalleryImage objects. 
      */
     async GetGroupGalleryImages({groupId, galleryId, n, offset, approved} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !galleryId) return new Error("Required Argument(s): groupId, galleryId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !galleryId) throw new Error("Required Argument(s): groupId, galleryId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}${this.#GenerateParameters({ n, offset, approved })}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -414,13 +414,13 @@ class GroupsApi {
      * @returns {Promise<GroupGallery>} Returns a single GroupGallery object.
      */
     async UpdateGroupGallery({groupId, groupGalleryId, name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupGalleryId) return new Error("Required Argument(s): groupId, groupGalleryId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId) throw new Error("Required Argument(s): groupId, groupGalleryId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}`, { method: 'PUT', body: this.#GenerateBody({ name, description, membersOnly, roleIdsToView, roleIdsToSubmit, roleIdsToAutoApprove, roleIdsToManage }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupGallery(json);
     }
 
@@ -434,13 +434,13 @@ class GroupsApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteGroupGallery(groupId, groupGalleryId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupGalleryId) return new Error("Required Argument(s): groupId, groupGalleryId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId) throw new Error("Required Argument(s): groupId, groupGalleryId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -455,13 +455,13 @@ class GroupsApi {
      * @returns {Promise<GroupGalleryImage>} Returns a single GroupGalleryImage object.
      */
     async AddGroupGalleryImage(groupId, groupGalleryId, fileId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupGalleryId || !fileId) return new Error("Required Argument(s): groupId, groupGalleryId, fileId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId || !fileId) throw new Error("Required Argument(s): groupId, groupGalleryId, fileId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}/images`, { method: 'PUT', body: this.#GenerateBody({ fileId }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupGalleryImage(json);
     }
 
@@ -476,13 +476,13 @@ class GroupsApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteGroupGalleryImage(groupId, groupGalleryId, groupGalleryImageId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupGalleryId || !groupGalleryImageId) return new Error("Required Argument(s): groupId, groupGalleryId, groupGalleryImageId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupGalleryId || !groupGalleryImageId) throw new Error("Required Argument(s): groupId, groupGalleryId, groupGalleryImageId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/galleries/${groupGalleryId}/images/${groupGalleryImageId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -495,13 +495,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
     async GetGroupInvitesSent(groupId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -522,13 +522,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async InviteUserToGroup({groupId, userId, confirmOverrideBlock} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites`, { method: 'POST', body: this.#GenerateBody({ userId, confirmOverrideBlock }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -542,13 +542,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async DeleteUserInvite(groupId, userId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/invites/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -561,13 +561,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
     async JoinGroup(groupId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/join`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -585,13 +585,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async LeaveGroup(groupId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/leave`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -607,13 +607,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
     async ListGroupMembers({groupId, n, offset} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members${this.#GenerateParameters({ n, offset })}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -632,13 +632,13 @@ class GroupsApi {
      * @returns {Promise<LimitedGroupMember>} Returns a single LimitedGroupMember object.
      */
     async GetGroupMember(groupId, userId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new LimitedGroupMember(json);
     }
 
@@ -656,13 +656,13 @@ class GroupsApi {
      * @returns {Promise<LimitedGroupMember>} Might return a single LimitedGroupMember object. The community-driven VRC docs are broken and don't specify, if you have VRC+ and have the knowledge to pull the json response from this network request, please contact me.
      */
     async UpdateGroupMember({groupId, userId, visibility, isSubscribedToAnnouncements, managerNotes} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}`, { method: 'PUT', body: this.#GenerateBody({ visibility, isSubscribedToAnnouncements, managerNotes }),headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new LimitedGroupMember(json);
     }
 
@@ -676,13 +676,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async KickGroupMember(groupId, userId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -697,13 +697,13 @@ class GroupsApi {
      * @returns {Promise<JSON>} Returns raw JSON, I don't have VRC+ so I'm unable to test these group-related features where the docs lack. If you can help with this, please contact me!
      */
     async AddRoleToGroupMember(groupId, userId, groupRoleId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId || !groupRoleId) return new Error("Required Argument(s): groupId, userId, groupRoleId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId || !groupRoleId) throw new Error("Required Argument(s): groupId, userId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}/roles/${groupRoleId}`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return json;
     }
 
@@ -718,13 +718,13 @@ class GroupsApi {
      * @returns {Promise<JSON>} Returns raw JSON, I don't have VRC+ so I'm unable to test these group-related features where the docs lack. If you can help with this, please contact me!
      */
     async RemoveRoleFromGroupMember(groupId, userId, groupRoleId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId || !groupRoleId) return new Error("Required Argument(s): groupId, userId, groupRoleId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId || !groupRoleId) throw new Error("Required Argument(s): groupId, userId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/members/${userId}/roles/${groupRoleId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return json;
     }
 
@@ -737,13 +737,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupPermission>>} Returns an array of GroupPermission objects.
      */
     async ListGroupPermissions(groupId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/permissions`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -761,13 +761,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupMember>>} Returns an array of GroupMember objects.
      */
     async GetGroupJoinRequests(groupId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/requests`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -785,13 +785,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async CancelGroupJoinRequest(groupId) { 
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/requests`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -807,13 +807,13 @@ class GroupsApi {
      * @returns {Promise<number>} Returns HTTP Status code.
      */
     async RespondToGroupJoinRequest({groupId, userId, action} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !userId) return new Error("Required Argument(s): groupId, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !userId) throw new Error("Required Argument(s): groupId, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/requests/${userId}`, { method: 'PUT', body: this.#GenerateBody({ action }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -826,13 +826,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupRole>>} Returns an array of GroupRole objects.
      */
     async GetGroupRoles(groupId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -856,13 +856,13 @@ class GroupsApi {
      * @returns {Promise<GroupRole>} Returns a single GroupRole object.
      */
     async CreateGroupRole({groupId, id, name, description, isSelfAssignable, permissions} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId) return new Error("Required Argument(s): groupId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId) throw new Error("Required Argument(s): groupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles`, { method: 'POST', body: this.#GenerateBody({ id, name, description, isSelfAssignable, permissions }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new GroupRole(json);
     }
 
@@ -882,13 +882,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupRole>>} Returns an array of GroupRole objects.
      */
     async UpdateGroupRole({groupId, groupRoleId, name, description, isSelfAssignable, permissions, order} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupRoleId) return new Error("Required Argument(s): groupId, groupRoleId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupRoleId) throw new Error("Required Argument(s): groupId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles/${groupRoleId}`, { method: 'PUT', body: this.#GenerateBody({ name, description, isSelfAssignable, permissions, order }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -907,13 +907,13 @@ class GroupsApi {
      * @returns {Promise<Array<GroupRole>>} Returns array of GroupRole objects.
      */
     async DeleteGroupRole(groupId, groupRoleId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!groupId || !groupRoleId) return new Error("Required Argument(s): groupId, groupRoleId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!groupId || !groupRoleId) throw new Error("Required Argument(s): groupId, groupRoleId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/groups/${groupId}/roles/${groupRoleId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {

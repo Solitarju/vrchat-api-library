@@ -40,7 +40,7 @@ class SystemApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/config`, { headers: this.#GenerateHeaders() });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, {});
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, {});
         return new APIConfig(json);
     }
 
@@ -64,7 +64,7 @@ class SystemApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/infoPush${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -87,7 +87,7 @@ class SystemApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/css/app.css${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
         const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
+        if(!res.ok) throw new Error((await res.json()).error?.message ?? "", res.status, {});
 
         return content ?? "";
     }
@@ -106,7 +106,7 @@ class SystemApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/js/app.js${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders() });
         const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
+        if(!res.ok) throw new Error((await res.json()).error?.message ?? "", res.status, {});
 
         return content ?? "";
     }
@@ -121,7 +121,7 @@ class SystemApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/visits`, { headers: this.#GenerateHeaders() });
         const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
+        if(!res.ok) throw new Error((await res.json()).error?.message ?? "", res.status, {});
 
         return content ?? "";
     }
@@ -136,7 +136,7 @@ class SystemApi {
         const res = await fetch(`${this.#APIEndpoint}/time`, { headers: this.#GenerateHeaders() });
         const content = await res.text().catch(err => {});
 
-        if(!res.ok) return new Error((await res.json()).error?.message ?? "", res.status, {});
+        if(!res.ok) throw new Error((await res.json()).error?.message ?? "", res.status, {});
 
         return content ?? "";
     }

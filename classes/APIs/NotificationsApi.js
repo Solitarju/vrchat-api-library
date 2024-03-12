@@ -51,13 +51,13 @@ class NotificationsApi {
      * @returns {Promise<Notification>} Returns an array of Notification objects.
      */
     async ListNotifications({ hidden = false, after = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ hidden, after, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -73,13 +73,13 @@ class NotificationsApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async AcceptFriendRequest(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!notificationId) throw new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/accept`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -90,13 +90,13 @@ class NotificationsApi {
      * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async MarkNotificationAsRead(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!notificationId) throw new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/see`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -107,13 +107,13 @@ class NotificationsApi {
      * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async DeleteNotification(notificationId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!notificationId) return new Error("Required Argument: notificationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!notificationId) throw new Error("Required Argument: notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/${notificationId}/hide`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -124,12 +124,12 @@ class NotificationsApi {
      * @returns {Promise<Success>} Returns a single success object.
      */
     async ClearAllNotifications() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/notifications/clear`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 

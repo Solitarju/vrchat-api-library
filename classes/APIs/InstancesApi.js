@@ -50,13 +50,13 @@ class InstancesApi {
      * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) throw new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Instance(json);
     }
 
@@ -67,13 +67,13 @@ class InstancesApi {
      * @returns {Promise<InstanceShortName>} Returns a single InstanceShortName object. 
      */
     async GetInstanceShortName(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) throw new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}/shortName`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new InstanceShortName(json);
     }
 
@@ -84,13 +84,13 @@ class InstancesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async SendSelfInvite(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) throw new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -101,13 +101,13 @@ class InstancesApi {
      * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstanceByShortName(shortName = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!shortName) return new Error("Required Argument: shortName", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!shortName) throw new Error("Required Argument: shortName", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, res);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, res);
         return new Instance(json);
     }
 

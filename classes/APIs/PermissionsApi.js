@@ -46,12 +46,12 @@ class PermissionsApi {
      * @returns {Promise<Array<Permission>>} Returns an array of Permission objects.
      */
     async GetAssignedPermissions() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/permissions`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -69,13 +69,13 @@ class PermissionsApi {
      * @returns {Promise<Permission>} Returns a single Permission object.
      */
     async GetPermission(permissionId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!permissionId) return new Error("Required Argument(s): permissionId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!permissionId) throw new Error("Required Argument(s): permissionId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/permissions/${permissionId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Permission(json);
     }
 

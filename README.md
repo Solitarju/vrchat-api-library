@@ -6,6 +6,8 @@ It provides real-time event handling through WebSockets, all endpoints and API s
 
 Feel free to reach out on the Discord server below for support or inquiries.  
 
+All dates in this document are formatted as YYYY-MM-DD (ISO 8601).  
+
 <div align="center">
   <a style="text-decoration: none;" href="https://github.com/Solitarju/vrchat-api-library">
     <img alt="GitHub" src="https://img.shields.io/github/license/Solitarju/vrchat-api-library?logo=github&label=GitHub&link=https%3A%2F%2Fgithub.com%2FSolitarju%2Fvrchat-api-library">
@@ -24,6 +26,7 @@ Feel free to reach out on the Discord server below for support or inquiries.
 - [Installation](#installation)  
 - [Getting Started](#getting-started)
 - [Classes/API Coverage](#classesapi-coverage)
+- [License Change](#license-change-2024-03-12--v200)
 - [TODO](#todo)
 - [Changelog](#changelog)
 
@@ -53,7 +56,6 @@ Each API section and endpoints are mostly built in reference to the **community-
 ## Installation
 
 Install the library via **NPM**:  
-Before installation, ensure you have **Node.js** installed.
 
 ```shell
 npm install vrchat-api-library
@@ -102,15 +104,27 @@ const asyncMethod = async () => {
         return await Prompt(`Please input ${type} two factor code:\n`);
     });
 
-    console.log(auth);
+    console.log(auth); // Logs authentication information as a JSON object to console.
 
-    console.log(await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }));
+    // Method ignoring errors.
+    const friendsArray = await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }); // Get an Array of LimitedUser objects as documented on the Community-driven API Docs.
+    for(let i = 0; i < friendsArray.length; i++) {
+      console.log(friendsArray[i].displayName); // Log display names of all offline friends to console returned from the API function call above.
+    }
+
+    // Method catching & handling errors. (I recommend catching & handling your errors, otherwise you could run into catastrophic errors that break your applications at runtime)
+    // Get an Array of LimitedUser objects as documented on the Community-driven API Docs and only log names if there was no error, otherwise log the error.
+    await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }).then(res => {
+        for(let i = 0; i < res.length; i++) {
+            console.log(res[i].displayName); // Log display names of all offline friends to console returned from the API function call above.
+        }
+    }).catch(err => console.log(err));
 
     // Basic EventsApi usage, making use of the VRChat class.
     vrchat.EventsApi.Connect();
 
     // Usage of custom undocumented event type, this isn't valid, just for demonstration purposes.
-    // Upon getting an undocumented event type, the library will warn you and ask to report it. (Please do this!!)
+    // Upon getting an undocumented event type, the library will warn you in the console and ask you to report it. (Please do this!!)
     vrchat.EventsApi.on("undocumented event", (data) => {
         console.log("Undocumented Event");
         console.log(data);
@@ -133,13 +147,15 @@ const asyncMethod = async () => {
     // vrchat.EventsApi.Disconnect(); -- Optionally disconnect from the API
 }
 
-asyncMethod();
+asyncMethod(); // run asynchronous code from a synchronous context.
 ```
 
 ## **Classes/API Coverage**
 
 Here's a comprehensive overview of the classes and APIs available in the library:  
-All APIs can also be found at the **community-driven** [VRChat API Docs](https://vrchatapi.github.io/docs/api/), with exception to the EventsApi.
+All APIs can also be found at the **community-driven** [VRChat API Docs](https://vrchatapi.github.io/docs/api/), with exception to the EventsApi.  
+
+All API's excluding the VRChat class, EventsApi & AuthenticationApi now use constructed response objects as documented in the community-driven VRChat Docs, such as the `GetOwnAvatar` function returning a constructed `Avatar` object.
 
 ### **VRChat**
 
@@ -152,7 +168,7 @@ All APIs can also be found at the **community-driven** [VRChat API Docs](https:/
 - **Features**:
   - Custom "user-online" and "user-offline" events to monitor user presence.
   - Event type modularity, allowing undocumented event types to work flawlessly.
-  - Smart event de-duplication, making sure events don't repeat/spam while letting authentic & valid events pass.
+  - Smart event de-duplication, making sure identical events don't repeat/spam while letting authentic & valid events pass.
 
 ### **AuthenticationApi**
 
@@ -218,23 +234,35 @@ All APIs can also be found at the **community-driven** [VRChat API Docs](https:/
 
 - **Description**: The Enums class consolidates various enumerations, including event types, for better organization and ease of use in the VRChat library.
 
+## **License Change (2024-03-12 / v2.0.0)**
+
+As of v2.0.0, this package no longer uses the [GPLv3](https://choosealicense.com/licenses/gpl-3.0/) license and now uses the permissive [MIT](https://choosealicense.com/licenses/mit/#) license, which as the sole developer of this project, I feel is more suitable for this project considering it is an NPM package that could be a dependency to other projects.  
+
+This will allow you to use this package as a dependency without having to source the original work or use the same license.
+
+**THIS DOES NOT APPLY TO VERSIONS PRIOR TO v2.0.0**
+
 ## TODO
 
 - Wiki/Documentation.
 - Code Consistency and General improvements.
-- User Class instead of raw JSON.
 - Potentially adding support for OSC (Open Sound Control).
 
 ## **Changelog**  
 
-All dates in this document are formatted as DD-MM-YYYY.
+All dates in this document are formatted as YYYY-MM-DD (ISO 8601).
 
-- v1.2.6 (06/12/2023)
-  - Started refactoring API response handling. (Creating classes and patching the API responses, UsersApi complete so far with one minor thing to work out)
-  - Updated User Agent parameters & contact information and made version update automatically with package.json, as it's impractical to manually change the hard code each time.
-  - Slight README improvements.
+- v2.0.0 (2024-03-12)
+  - Implemented all documented structured response classes for all API's (excluding the Authentication API & Events API), making for an improved developer experience when handling API responses rather than using raw JSON with no intellisense.
+  - Implemented constructed error objects and better error handling.
+  - Added JSDoc to most functions.
+  - Switch to a more permissive license that is more suitable for an NPM package. ([MIT](https://choosealicense.com/licenses/mit/#))
+  - Updated User Agent parameters & contact information and made header version update automatically using version from package.json, as it's impractical to manually change the hard code each time.
+  - Fixed SystemApi.
+  - Slight README improvements & updates in accordance to the new response classes.
+  - Bump to v2.0.0
 
-- v1.2.5 (16/10/2023)
+- v1.2.5 (2023-10-16)
   - Fixed missing Enums import for GenerateParamater function in Util class.
   - Reformatted and updated README for improved clarity and more comprehensive general information.
   - Changed Discord support server.
@@ -278,4 +306,4 @@ All dates in this document are formatted as DD-MM-YYYY.
   - Added typescript declarations file.
   - README markdown updates. (TODO, Changelogs, Disclamers).
 
-License: [GNU GPLv3](https://github.com/Solitarju/vrchat-api-library/blob/main/LICENSE)
+License: [MIT](https://choosealicense.com/licenses/mit/#)

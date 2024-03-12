@@ -51,13 +51,13 @@ class FavoritesApi {
      * @returns {Promise<Array<Favorite>>} Returns an array of favorite objects.
      */
     async ListFavorites({ n= 60, offset = 0, type = "", tag = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, type, tag });
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -73,13 +73,13 @@ class FavoritesApi {
      * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!type || !favoriteId || !tags.length > 0) return new Error("Required Argument(s): type, favoriteId, tags", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!type || !favoriteId || !tags.length > 0) throw new Error("Required Argument(s): type, favoriteId, tags", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites`, { method: 'POST', body: JSON.stringify({ type, favoriteId, tags }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Favorite(json);
     }
 
@@ -90,13 +90,13 @@ class FavoritesApi {
      * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async ShowFavorite(favoriteId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteId) return new Error("Required Argument: favoriteId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) throw new Error("Required Argument: favoriteId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Favorite(json);
     }
 
@@ -107,13 +107,13 @@ class FavoritesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async RemoveFavorite(favoriteId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteId) return new Error("Required Argument: favoriteId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) throw new Error("Required Argument: favoriteId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -124,13 +124,13 @@ class FavoritesApi {
      * @returns {Promise<Array<FavoriteGroup>>} Returns an array of FavoriteGroup objects.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, ownerId });
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/groups${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -146,13 +146,13 @@ class FavoritesApi {
      * @returns {Promise<FavoriteGroup>} Returns a single FavoriteGroup object.
      */
     async ShowFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) throw new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new FavoriteGroup(json);
     }
 
@@ -163,8 +163,8 @@ class FavoritesApi {
      * @returns {Promise<Number>} Returns HTTP Status of the request.
      */
     async UpdateFavoriteGroup({ favoriteGroupType = "", favoriteGroupName = "", userId = "", displayName = "", visibility = "", tags = [] } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) throw new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
         let params = {};
         if(displayName) params.displayName = displayName;
@@ -174,7 +174,7 @@ class FavoritesApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { method: 'PUT', body: JSON.stringify(params), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -185,13 +185,13 @@ class FavoritesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async ClearFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) throw new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 

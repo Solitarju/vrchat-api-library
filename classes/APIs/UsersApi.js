@@ -49,13 +49,13 @@ class UsersApi {
      * @returns {Promise<Array<LimitedUser>>} Returns an array of LimitedUser objects.
      */
     async SearchAllUsers({ displayName = "", returnAmount = 1, offset = 0 } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!displayName) return new Error("Required argument: displayName", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!displayName) throw new Error("Required argument: displayName", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users?search=${displayName}${returnAmount > 0 && returnAmount < 100 ? "&n=" + returnAmount : ""}${offset > 0 ? "&offset=" + offset : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var objectArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -71,13 +71,13 @@ class UsersApi {
      * @returns {Promise<User>} Returns a single User object.
      */
     async GetUserById(userid = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userid) return new Error("Required argument: userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userid) throw new Error("Required argument: userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${userid}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new User(json);
     }
 
@@ -97,7 +97,7 @@ class UsersApi {
      * @returns {Promise<CurrentUser>} Returns an updated CurrentUser object.
      */
     async UpdateUserInfo({email, birthday, tags, status, statusDescription, bio, bioLinks} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const args = {email, birthday, tags, status, statusDescription, bio, bioLinks};
         let bodyJSON = {};
@@ -109,7 +109,7 @@ class UsersApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}`, { method: "PUT", headers: this.#GenerateHeaders(true, "application/json"), body: JSON.stringify(bodyJSON) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new CurrentUser(json);
     }
 
@@ -120,12 +120,12 @@ class UsersApi {
      * @returns {Promise<Array<Group>>} Returns an array of Group objects.
      */
     async GetUserGroups() {
-        if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
+        if(!this.#authCookie) throw new Error('Invalid Credentials', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var GroupArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -141,12 +141,12 @@ class UsersApi {
      * @returns {Promise<Array<Group>>} Returns an array of group requests.
      */
     async GetUserGroupRequests() {
-        if(!this.#authCookie) return new Error('Invalid Credentials', 401, {});
+        if(!this.#authCookie) throw new Error('Invalid Credentials', 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/users/${this.#userid}/groups/requested`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var GroupArray = [];
         for(let i = 0; i < json.length; i++) {

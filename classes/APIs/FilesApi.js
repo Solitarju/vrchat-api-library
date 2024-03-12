@@ -53,13 +53,13 @@ class FilesApi {
      * @returns {Promise<Array<File>>} Returns an array of File objects.
      */
     async ListFiles({ tag = "", n = 60, offset = 0 } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ tag, n, offset });
         const res = await this.#fetch(`${this.#APIEndpoint}/files${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -75,8 +75,8 @@ class FilesApi {
      * @returns {Promise<File>} Returns a single File object.
      */
     async CreateFile({ name = "", mimeType = "", extension = "", tags = [] } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!name || !mimeType || !extension) return new Error("Required Argument(s): name, mimeType, extension", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!name || !mimeType || !extension) throw new Error("Required Argument(s): name, mimeType, extension", 400, {});
 
         let bodyData = { name, mimeType, extension };
         if(tags) bodyData.tags = tags;
@@ -84,7 +84,7 @@ class FilesApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/file`, { method: 'POST', body: JSON.stringify(bodyData), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new File(json);
     }
 
@@ -95,13 +95,13 @@ class FilesApi {
      * @returns {Promise<File>} Returns a single File object.
      */
     async ShowFile(fileId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId) return new Error("Required Argument: fileId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId) throw new Error("Required Argument: fileId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new File(json);
     }
 
@@ -112,8 +112,8 @@ class FilesApi {
      * @returns {Promise<File>} Returns a single File object.
      */
     async CreateFileVersion({ fileId = "", signatureMd5 = "", signatureSizeInBytes = 0, fileMd5 = "", fileSizeInBytes = 0 } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !signatureMd5 || !signatureSizeInBytes) return new Error("Required Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !signatureMd5 || !signatureSizeInBytes) throw new Error("Required Argument(s): fileId, signatureMd5, signatureSizeInBytes", 400, {});
 
         let bodyData = { signatureMd5, signatureSizeInBytes };
         if(fileMd5) bodyData.fileMd5 = fileMd5;
@@ -122,7 +122,7 @@ class FilesApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { method: 'POST', body: JSON.stringify(bodyData), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new File(json);
     }
 
@@ -133,13 +133,13 @@ class FilesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteFile(fileId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId) return new Error("Required Argument: fileId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId) throw new Error("Required Argument: fileId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -156,8 +156,8 @@ class FilesApi {
      * @returns {Promise<Buffer>} Returns the raw file data in a Buffer object.
      */
     async DownloadFileVersion(fileId = "", versionId = 0, optionalDownloadPath = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId) return new Error("Required Argument(s): fileId, VersionId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId) throw new Error("Required Argument(s): fileId, VersionId", 400, {});
 
         let buffer = [];
         let res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { headers: this.#GenerateHeaders(true) }).then(async res => {
@@ -184,7 +184,7 @@ class FilesApi {
             fs.writeFile(optionalDownloadPath, buffer, (err) => { fileWriteError = err });
         }
 
-        if(!res.ok) return new Error("No error message obtainable. Check status code.", res.status, {});
+        if(!res.ok) throw new Error("No error message obtainable. Check status code.", res.status, {});
         if(fileWriteError) return fileWriteError;
         return buffer;
     }
@@ -196,13 +196,13 @@ class FilesApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeleteFileVersion(fileId = "", versionId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId) return new Error("Required Argument(s): fileId, versionId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId) throw new Error("Required Argument(s): fileId, versionId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -213,14 +213,14 @@ class FilesApi {
      * @returns {Promise<File>} Returns a single File object.
      */
     async FinishFileDataUpload({fileId = "", versionId = "", fileType = "", etags = []} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId || !fileType) throw new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         let bodyData = etags.length > 0 ? JSON.stringify({ etags }) : "";
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/finish`, { method: 'PUT', body: bodyData, headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new File(json);
     }
 
@@ -231,13 +231,13 @@ class FilesApi {
      * @returns {Promise<FileUpload>} Returns a single FileUpload object.
      */
     async StartFileDataUpload(fileId = "", versionId = "", fileType = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId || !fileType) throw new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/start`, { method: 'PUT', headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new FileUpload(json);
     }
 
@@ -248,13 +248,13 @@ class FilesApi {
      * @returns {Promise<FileVersionUploadStatus>} Returns a single FileVersionUploadStatus object.
      */
     async CheckFileDataUploadStatus(fileId = "", versionId = "", fileType = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!fileId || !versionId || !fileType) return new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!fileId || !versionId || !fileType) throw new Error("Required Argument(s): fileId, versionId, fileType", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/file/${fileId}/${versionId}/${fileType}/status`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new FileVersionUploadStatus(json);
     }
 

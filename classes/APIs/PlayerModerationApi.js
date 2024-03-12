@@ -59,13 +59,13 @@ class PlayerModerationApi {
      * @returns {Promise<Array<PlayerModeration>>} Returns an array of PlayerModeration objects.
      */
     async SearchPlayerModerations({type, targetUserId} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ type, targetUserId });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -88,13 +88,13 @@ class PlayerModerationApi {
      * @returns {Promise<PlayerModeration>} Returns a single PlayerModeration object.
      */
     async ModerateUser(moderated, type) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!moderated || !type) return new Error("Required Argument(s): moderated, type", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!moderated || !type) throw new Error("Required Argument(s): moderated, type", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations`, { method: 'POST', body: JSON.stringify({ moderated, type }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new PlayerModeration(json);
     }
 
@@ -107,12 +107,12 @@ class PlayerModerationApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async ClearAllPlayerModerations() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -127,13 +127,13 @@ class PlayerModerationApi {
      * @returns {Promise<PlayerModeration>} Returns a single PlayerModeration object.
      */
     async GetPlayerModeration(playerModerationId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!playerModerationId) return new Error("Required Argument(s): playerModerationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!playerModerationId) throw new Error("Required Argument(s): playerModerationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations/${playerModerationId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new PlayerModeration(json);
     }
 
@@ -148,13 +148,13 @@ class PlayerModerationApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async DeletePlayerModeration(playerModerationId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!playerModerationId) return new Error("Required Argument(s): playerModerationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!playerModerationId) throw new Error("Required Argument(s): playerModerationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/playermoderations/${playerModerationId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -170,13 +170,13 @@ class PlayerModerationApi {
      * @returns {Promise<Success>} Returns a single Success object.
      */
     async UnModerateUser(moderated, type) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!moderated || !type) return new Error("Required Argument(s): moderated, type", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!moderated || !type) throw new Error("Required Argument(s): moderated, type", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/unplayermoderate`, { method: 'PUT', body: JSON.stringify({ moderated, type }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 

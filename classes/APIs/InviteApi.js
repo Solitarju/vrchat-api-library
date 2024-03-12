@@ -53,13 +53,13 @@ class InviteApi {
      * @returns {Promise<SentNotification>} Returns a single SentNotification object.
      */
     async InviteUser({userId, instanceId, messageSlot} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId || !instanceId) return new Error("Required Argument(s): userId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId || !instanceId) throw new Error("Required Argument(s): userId, instanceId", 400, {});
 
         const res = await this.#fetch(`$${this.#APIEndpoint}/invite/${userId}`, { method: 'POST', body: JSON.stringify({ instanceId, messageSlot }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new SentNotification(json);
     }
 
@@ -73,13 +73,13 @@ class InviteApi {
      * @returns {Promise<SentNotification>} Returns a single SentNotification object.
      */
     async InviteMyselfToInstance(worldId, instanceId) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId || !instanceId) return new Error("Required Argument(s): userId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId || !instanceId) throw new Error("Required Argument(s): userId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true, "application/json") }); // No body data so I don't know why I'm using application/json but the docs specify it.
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new SentNotification(json);
     }
 
@@ -93,13 +93,13 @@ class InviteApi {
      * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async RequestInvite(userId, messageSlot) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId) return new Error("Required Argument(s): userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId) throw new Error("Required Argument(s): userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/requestInvite/${userId}`, { method: 'POST', body: JSON.stringify({ messageSlot }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -113,13 +113,13 @@ class InviteApi {
      * @returns {Promise<Notification>} Returns a single Notification object.
      */
     async RespondInvite(notificationId, responseSlot) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!notificationId) return new Error("Required Argument(s): notificationId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!notificationId) throw new Error("Required Argument(s): notificationId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/${notificationId}/response`, { method: 'POST', body: JSON.stringify({ responseSlot }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -135,14 +135,14 @@ class InviteApi {
      * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
     async ListInviteMessages(userId, messageType) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
         if(!userId) userId = this.#userid;
         if(!messageType) messageType = "message";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -165,15 +165,15 @@ class InviteApi {
      * @returns {Promise<InviteMessage>} Returns a single InviteMessage object.
      */
     async GetInviteMessage({userId, messageType, slot} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!slot) return new Error("Required Argument(s): slot", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!slot) throw new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
         if(!messageType) messageType = "message";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new InviteMessage(json);
     }
 
@@ -194,8 +194,8 @@ class InviteApi {
      * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
     async UpdateInviteMessage({userId, messageType, slot, message} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!slot) return new Error("Required Argument(s): slot", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!slot) throw new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
         if(!messageType) messageType = "message";
         if(!message) message = "";
@@ -203,7 +203,7 @@ class InviteApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'PUT', body: JSON.stringify({ message }), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -228,15 +228,15 @@ class InviteApi {
      * @returns {Promise<Array<InviteMessage>>} Returns an array of InviteMessage objects.
      */
     async ResetInviteMessage({userId, messageType, slot} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!slot) return new Error("Required Argument(s): slot", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!slot) throw new Error("Required Argument(s): slot", 400, {});
         if(!userId) userId = this.#userid;
         if(!messageType) messageType = "message";
 
         const res = await this.#fetch(`${this.#APIEndpoint}/message/${userId}/${messageType}/${slot}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
