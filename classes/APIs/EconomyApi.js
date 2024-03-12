@@ -1,3 +1,9 @@
+const { Transaction } = require('../Transaction.js');
+const { UserSubscription } = require('../UserSubscription.js');
+const { Subscription } = require('../Subscription.js');
+const { LicenseGroup } = require('../LicenseGroup.js');
+const { Error } = require('../Error.js');
+
 class EconomyApi {
 
     #fetch;
@@ -39,61 +45,80 @@ class EconomyApi {
      * 
      * Get all own Steam transactions.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Transaction>>} Returns an array of Transaction objects.
      */
     async ListSteamTransactions() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/Steam/transactions`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Transaction(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Get a list of all current user subscriptions.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<UserSubscription>>} Returns an array of UserSubscription objects.
      */
     async GetCurrentSubscriptions() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/subscription`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new UserSubscription(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * List all existing Subscriptions. For example, "vrchatplus-monthly" and "vrchatplus-yearly".
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Subscription>>} Returns an array of Subscription objects.
      */
     async ListSubscriptions() {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/subscriptions`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Subscription(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Get a single License Group by given ID.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<LicenseGroup>} Returns a single LicenseGroup object.
      */
     async GetLicenseGroup(licenseGroupId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!licenseGroupId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!licenseGroupId) return new Error("Required Argument: licenseGroupId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/licenseGroups/${licenseGroupId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new LicenseGroup(json);
     }
 
 }

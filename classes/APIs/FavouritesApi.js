@@ -1,4 +1,8 @@
-const Util = require('./Util.js');
+const { Favorite } = require('../Favorite.js');
+const { FavoriteGroup } = require('../FavoriteGroup.js');
+const { Success } = require('../Success.js');
+const { Error } = require('../Error.js');
+const Util = require('../Util.js');
 
 class FavoritesApi {
 
@@ -44,131 +48,151 @@ class FavoritesApi {
      * 
      * Returns a list of favorites.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<Favorite>>} Returns an array of favorite objects.
      */
     async ListFavorites({ n= 60, offset = 0, type = "", tag = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, type, tag });
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        let returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new Favorite(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Add a new favorite, friend groups are named group_0 through group_3 while Avatar and World groups are named avatars1 to avatars4 and worlds1 to worlds4.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async AddFavorite({ type = "", favoriteId = "", tags = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!type || !favoriteId || tags.length < 1) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!type || !favoriteId || !tags.length > 0) return new Error("Required Argument(s): type, favoriteId, tags", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites`, { method: 'POST', body: JSON.stringify({ type, favoriteId, tags }), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Favorite(json);
     }
 
     /**
      * 
      * Return information about a specific Favorite.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Favorite>} Returns a single Favorite object.
      */
     async ShowFavorite(favoriteId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) return new Error("Required Argument: favoriteId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Favorite(json);
     }
 
     /**
      * 
      * Remove a favorite from your favorites list.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async RemoveFavorite(favoriteId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteId) return new Error("Required Argument: favoriteId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorites/${favoriteId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
      * 
      * Return a list of favorite groups owned by a user.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Array<FavoriteGroup>>} Returns an array of FavoriteGroup objects.
      */
     async ListFavoriteGroups({ n = 60, offset = 0, ownerId = "" } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ n, offset, ownerId });
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/groups${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+
+        var returnArray = [];
+        for(let i = 0; i < json.length; i++) {
+            returnArray.push(new FavoriteGroup(json[i]));
+        }
+        return returnArray;
     }
 
     /**
      * 
      * Fetch information about a specific favorite group.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<FavoriteGroup>} Returns a single FavoriteGroup object.
      */
     async ShowFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new FavoriteGroup(json);
     }
 
     /**
      * 
      * Update information about a specific favorite group.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Number>} Returns HTTP Status of the request.
      */
     async UpdateFavoriteGroup({ favoriteGroupType = "", favoriteGroupName = "", userId = "", displayName = "", visibility = "", tags = [] } = {}) {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
-        const params = { displayName, visibility };
+        let params = {};
+        if(displayName) params.displayName = displayName;
+        if(visibility) params.visibility = visibility;
         if(tags.length > 0) params.tags = tags;
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { method: 'PUT', body: JSON.stringify(params), headers: this.#GenerateHeaders(true, "application/json") });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return res.status;
     }
 
     /**
      * 
      * Clear ALL contents of a specific favorite group.
      * 
-     * @returns {Promise<JSON>}
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async ClearFavoriteGroup(favoriteGroupType = "", favoriteGroupName = "", userId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!favoriteGroupType || !favoriteGroupName || !userId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!favoriteGroupType || !favoriteGroupName || !userId) return new Error("Required Argument(s): favoriteGroupType, favoriteGroupName, userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/favorite/group/${favoriteGroupType}/${favoriteGroupName}/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
 }

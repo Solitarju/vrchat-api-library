@@ -132,3 +132,4 @@ dist
 # Misc
 .vscode
 ignore
+*.mp4

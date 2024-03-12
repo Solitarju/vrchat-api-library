@@ -1,3 +1,8 @@
+const { Instance } = require('../Instance.js');
+const { InstanceShortName } = require('../InstanceShortName.js');
+const { Success } = require('../Success.js');
+const { Error } = require('../Error.js');
+
 class InstancesApi {
 
     #fetch;
@@ -42,64 +47,68 @@ class InstancesApi {
      * 
      * If an invalid instanceId is provided, this endpoint will simply return "null"!
      * 
-     * @returns {Promise<JSON>} 
+     * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Instance(json);
     }
 
     /**
      * 
      * Returns an instance short name.
      * 
-     * @returns {Promise<JSON>} 
+     * @returns {Promise<InstanceShortName>} Returns a single InstanceShortName object. 
      */
     async GetInstanceShortName(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/${worldId}:${instanceId}/shortName`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new InstanceShortName(json);
     }
 
     /**
      * 
      * Sends an invite to the instance to yourself.
      * 
-     * @returns {Promise<JSON>} 
+     * @returns {Promise<Success>} Returns a single Success object.
      */
     async SendSelfInvite(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!worldId || !instanceId) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/invite/myself/to/${worldId}:${instanceId}`, { method: 'POST', headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        return new Success(json);
     }
 
     /**
      * 
      * Returns an instance.
      * 
-     * @returns {Promise<JSON>} 
+     * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetInstanceByShortName(shortName = "") {
-        if(!this.#authCookie) return { success: false, status: 401 };
-        if(!shortName) return { success: false, status: 400 };
+        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!shortName) return new Error("Required Argument: shortName", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/instances/s/${shortName}`, { headers: this.#GenerateHeaders(true) });
-        if(!res.ok) return { success: false, status: res.status };
+        const json = await res.json();
 
-        return { success: true, res: await res.json() };
+        if(!res.ok) return new Error(json.error?.message ?? "", res.status, res);
+        return new Instance(json);
     }
 
 }
