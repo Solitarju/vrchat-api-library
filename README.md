@@ -106,10 +106,19 @@ const asyncMethod = async () => {
 
     console.log(auth); // Logs authentication information as a JSON object to console.
 
+    // Method ignoring errors.
     const friendsArray = await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }); // Get an Array of LimitedUser objects as documented on the Community-driven API Docs.
     for(let i = 0; i < friendsArray.length; i++) {
       console.log(friendsArray[i].displayName); // Log display names of all offline friends to console returned from the API function call above.
     }
+
+    // Method catching & handling errors. (I recommend catching & handling your errors, otherwise you could run into catastrophic errors that break your applications at runtime)
+    // Get an Array of LimitedUser objects as documented on the Community-driven API Docs and only log names if there was no error, otherwise log the error.
+    await vrchat.FriendsApi.ListFriends({ n: 100, offline: true }).then(res => {
+        for(let i = 0; i < res.length; i++) {
+            console.log(res[i].displayName); // Log display names of all offline friends to console returned from the API function call above.
+        }
+    }).catch(err => console.log(err));
 
     // Basic EventsApi usage, making use of the VRChat class.
     vrchat.EventsApi.Connect();
