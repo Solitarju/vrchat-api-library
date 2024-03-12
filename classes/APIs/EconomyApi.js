@@ -48,12 +48,12 @@ class EconomyApi {
      * @returns {Promise<Array<Transaction>>} Returns an array of Transaction objects.
      */
     async ListSteamTransactions() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/Steam/transactions`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -69,12 +69,12 @@ class EconomyApi {
      * @returns {Promise<Array<UserSubscription>>} Returns an array of UserSubscription objects.
      */
     async GetCurrentSubscriptions() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/subscription`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -90,12 +90,12 @@ class EconomyApi {
      * @returns {Promise<Array<Subscription>>} Returns an array of Subscription objects.
      */
     async ListSubscriptions() {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/subscriptions`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         let returnArray = [];
         for(let i = 0; i < json.length; i++) {

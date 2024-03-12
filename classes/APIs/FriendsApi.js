@@ -52,13 +52,13 @@ class FriendsApi {
      * @returns {Promise<Array<LimitedUser>>} Returns an array of LimitedUser objects.
      */
     async ListFriends({ offset = 0, n = 60, offline = false } = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ offset, n, offline });
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/friends${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -74,13 +74,13 @@ class FriendsApi {
      * @returns {Promise<Notification>} Returns a notification object.
      */
     async SendFriendRequest(userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId) return new Error("Required Argument: userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId) throw new Error("Required Argument: userId", 400, {});
         
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendRequest`, { method: 'POST', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Notification(json);
     }
 
@@ -91,13 +91,13 @@ class FriendsApi {
      * @returns {Promise<Success>} Returns a Success object if the operation was successful.
      */
     async DeleteFriendRequest(userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId) return new Error("Required Argument: userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId) throw new Error("Required Argument: userId", 400, {});
         
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendRequest`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 
@@ -108,13 +108,13 @@ class FriendsApi {
      * @returns {Promise<FriendStatus>} Returns a FriendStatus object with values depending on the friendship status of the current user and specified user.
      */
     async CheckFriendStatus(userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId) return new Error("Required Argument: userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId) throw new Error("Required Argument: userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/user/${userId}/friendStatus`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new FriendStatus(json);
     }
 
@@ -125,13 +125,13 @@ class FriendsApi {
      * @returns {Promise<Success>} Returns a Success object if the operation was successful.
      */
     async Unfriend(userId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!userId) return new Error("Required Argument: userId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!userId) throw new Error("Required Argument: userId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/auth/user/friends/${userId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Success(json);
     }
 }

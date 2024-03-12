@@ -69,13 +69,13 @@ class WorldsApi {
      * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async SearchAllWorlds({featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, user, userId, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -107,8 +107,8 @@ class WorldsApi {
      * @returns {Promise<World>} Returns a single World object.
      */
     async CreateWorld({assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!assetUrl || !imageUrl || !name) return new Error("Required Argument(s): assetUrl, imageUrl, name", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!assetUrl || !imageUrl || !name) throw new Error("Required Argument(s): assetUrl, imageUrl, name", 400, {});
 
         const args = {assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion};
         let bodyJSON = {};
@@ -120,7 +120,7 @@ class WorldsApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds`, { method: 'POST', body: JSON.stringify(bodyJSON), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
     
@@ -146,13 +146,13 @@ class WorldsApi {
      * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
     */
     async ListActiveWorlds({featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
         
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/active${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -183,13 +183,13 @@ class WorldsApi {
      * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async ListFavoritedWorlds({featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/favorites${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -220,13 +220,13 @@ class WorldsApi {
      * @returns {Promise<Array<LimitedWorld>>} Returns an array of LimitedWorld objects.
      */
     async ListRecentWorlds({featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
 
         const params = this.#GenerateParameters({ featured, sort, n, order, offset, search, tag, notag, releaseStatus, maxUnityVersion, minUnityVersion, platform, userId });
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/recent${params ? "?" + params : ""}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
 
         var returnArray = [];
         for(let i = 0; i < json.length; i++) {
@@ -242,13 +242,13 @@ class WorldsApi {
      * @returns {Promise<World>} Returns a single World object.
      */
     async GetWorldById(worldId = "") {
-        if(!worldId) return new Error("Required Argument: worldId", 400, {});
+        if(!worldId) throw new Error("Required Argument: worldId", 400, {});
 
         const headers = this.#authCookie ? this.#GenerateHeaders(true) : this.#GenerateHeaders(); // Use authenticated over unauthenticated, but no auth still works just returns 0 in some fields.
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { headers: headers });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
 
@@ -275,8 +275,8 @@ class WorldsApi {
      * @returns {Promise<World>} Returns a single World object.
      */
     async UpdateWorld({assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion} = {}) {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!id) return new Error("Required Argument: id", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!id) throw new Error("Required Argument: id", 400, {});
 
         const args = {assetUrl, assetVersion, authorId, authorName, capacity, description, id, imageUrl, name, platform, releaseStatus, tags, unityPackageUrl, unityVersion};
         let bodyJSON = {};
@@ -288,7 +288,7 @@ class WorldsApi {
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${id}`, { method: 'PUT', body: JSON.stringify(bodyJSON), headers: this.#GenerateHeaders(true, "application/json") });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new World(json);
     }
 
@@ -299,13 +299,13 @@ class WorldsApi {
      * @returns {Promise<Number>} Returns HTTP status code.
      */
     async DeleteWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId) return new Error("Required Argument: worldId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId) throw new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -316,13 +316,13 @@ class WorldsApi {
      * @returns {Promise<WorldPublishStatus>} Returns a single WorldPublishStatus object.
      */
     async GetWorldPublishStatus(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId) return new Error("Required Argument: worldId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId) throw new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new WorldPublishStatus(json);
     }
 
@@ -333,13 +333,13 @@ class WorldsApi {
      * @returns {Promise<Number>} Returns HTTP status code.
      */
     async PublishWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId) return new Error("Required Argument: worldId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId) throw new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'PUT', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -350,13 +350,13 @@ class WorldsApi {
      * @returns {Promise<Number>} Returns HTTP status code.
      */
     async UnpublishWorld(worldId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId) return new Error("Required Argument: worldId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId) throw new Error("Required Argument: worldId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/publish`, { method: 'DELETE', headers: this.#GenerateHeaders(true) });
         const json = await res.json();
 
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return res.status;
     }
 
@@ -367,13 +367,13 @@ class WorldsApi {
      * @returns {Promise<Instance>} Returns a single Instance object.
      */
     async GetWorldInstance(worldId = "", instanceId = "") {
-        if(!this.#authCookie) return new Error("Invalid Credentials", 401, {});
-        if(!worldId || !instanceId) return new Error("Required Argument(s): worldId, instanceId", 400, {});
+        if(!this.#authCookie) throw new Error("Invalid Credentials", 401, {});
+        if(!worldId || !instanceId) throw new Error("Required Argument(s): worldId, instanceId", 400, {});
 
         const res = await this.#fetch(`${this.#APIEndpoint}/worlds/${worldId}/${instanceId}`, { headers: this.#GenerateHeaders(true) });
         const json = await res.json();
         
-        if(!res.ok) return new Error(json.error?.message ?? "", res.status, json);
+        if(!res.ok) throw new Error(json.error?.message ?? "", res.status, json);
         return new Instance(json);
     }
 
